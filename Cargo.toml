@@ -13,7 +13,7 @@ dotenv = "0.15.0"
 rand = "0.8"
 anyhow = "1.0"
 
-iotics-identity = { git = "https://github.com/Iotic-Labs/iotics-identity-rust" }
+iotics-identity = { git = "ssh://git@github.com/Iotic-Labs/iotics-identity-rust.git" }
 
 [build-dependencies]
 tonic-build = "0.5"
