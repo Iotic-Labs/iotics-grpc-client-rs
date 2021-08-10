@@ -38,8 +38,8 @@ pub use tonic::Streaming;
 
 pub use common::{
     property::Value, FeedData, FeedId, GeoCircle, GeoLocation, Headers, HostId, LabelUpdate,
-    LangLiteral, Limit, Offset, Property, Range, Scope, StringLiteral, SubscriptionHeaders, Tags,
-    TwinId, Uri, Value as FeedValue, Values as FeedValues, Visibility,
+    LangLiteral, Limit, Literal, Offset, Property, Range, Scope, StringLiteral,
+    SubscriptionHeaders, Tags, TwinId, Uri, Value as FeedValue, Values as FeedValues, Visibility,
 };
 use feed::create_feed_request::{
     Arguments as CreateFeedRequestArguments, Payload as CreateFeedRequestPayload,
