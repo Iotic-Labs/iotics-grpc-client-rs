@@ -71,7 +71,8 @@ use twin::update_twin_request::{
     Arguments as UpdateTwinRequestArguments, Payload as UpdateTwinRequestPayload,
 };
 use twin::{
-    CreateTwinRequest, DeleteTwinRequest, PropertyUpdate, UpdateTwinRequest, VisibilityUpdate,
+    CreateTwinRequest, DeleteTwinRequest, GeoLocationUpdate, PropertyUpdate, UpdateTwinRequest,
+    VisibilityUpdate,
 };
 
 use crate::helpers::generate_client_app_id;
@@ -117,8 +118,18 @@ pub async fn create_update_twin_with_feeds(
     properties: Vec<Property>,
     tags: Vec<String>,
     feeds: Vec<TwinFeed>,
+    location: Option<GeoLocation>,
 ) -> Result<String, anyhow::Error> {
-    let did = create_update_twin(api_config, token.clone(), seed, label, properties, tags).await?;
+    let did = create_update_twin(
+        api_config,
+        token.clone(),
+        seed,
+        label,
+        properties,
+        tags,
+        location,
+    )
+    .await?;
 
     for feed in feeds {
         create_update_feed(api_config, token.clone(), &did, &feed).await?;
@@ -291,6 +302,7 @@ pub async fn create_update_twin(
     label: String,
     properties: Vec<Property>,
     tags: Vec<String>,
+    location: Option<GeoLocation>,
 ) -> Result<String, anyhow::Error> {
     let mut client = TwinApiClient::connect(api_config.host_address.clone()).await?;
 
@@ -334,7 +346,7 @@ pub async fn create_update_twin(
         twin_id: Some(twin_id.clone()),
     };
 
-    let payload = UpdateTwinRequestPayload {
+    let mut payload = UpdateTwinRequestPayload {
         labels: Some(LabelUpdate {
             added: vec![LangLiteral {
                 lang: "en".to_string(),
@@ -356,6 +368,12 @@ pub async fn create_update_twin(
         }),
         ..Default::default()
     };
+
+    if let Some(location) = location {
+        payload.location = Some(GeoLocationUpdate {
+            location: Some(location),
+        });
+    }
 
     let mut request = tonic::Request::new(UpdateTwinRequest {
         headers: Some(headers),
