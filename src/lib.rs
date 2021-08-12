@@ -55,7 +55,7 @@ use feed::Feed;
 use feed::{CreateFeedRequest, ShareFeedDataRequest, UpdateFeedRequest};
 use interest::fetch_interest_request::Arguments;
 use interest::interest::FollowedFeed;
-use interest::interest_api_client::InterestApiClient;
+pub use interest::interest_api_client::InterestApiClient;
 use interest::Interest;
 pub use interest::{FetchInterestRequest, FetchInterestResponse};
 pub use iotics_identity::Config;
@@ -572,14 +572,33 @@ async fn search_page(
 
 pub async fn follow(
     api_config: &Config,
-    token: String,
+    token: &str,
     followed_host_id: Option<HostId>,
     followed_twin_id: TwinId,
     followed_feed: String,
     follower_twin_id: TwinId,
-) -> Result<Streaming<FetchInterestResponse>, Box<dyn std::error::Error>> {
+) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
     let mut client = InterestApiClient::connect(api_config.host_address.clone()).await?;
 
+    follow_with_channel(
+        &mut client,
+        token,
+        followed_host_id,
+        followed_twin_id,
+        followed_feed,
+        follower_twin_id,
+    )
+    .await
+}
+
+pub async fn follow_with_channel(
+    client: &mut InterestApiClient<Channel>,
+    token: &str,
+    followed_host_id: Option<HostId>,
+    followed_twin_id: TwinId,
+    followed_feed: String,
+    follower_twin_id: TwinId,
+) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
     let client_app_id = generate_client_app_id();
 
     let headers = Headers {
@@ -604,51 +623,19 @@ pub async fn follow(
                 follower_twin_id: Some(follower_twin_id),
             }),
         }),
-        // fetch_last_stored: Some(true),
         ..Default::default()
     });
 
     request.metadata_mut().append(
         "authorization",
-        token.parse().expect("Failed to parse token"),
+        token.parse().context("parse token failed")?,
     );
 
-    let stream = client.fetch_interests(request).await?.into_inner();
+    let stream = client
+        .fetch_interests(request)
+        .await
+        .context("follow feed failed")?
+        .into_inner();
 
     Ok(stream)
 }
-
-// async fn test_describe(host_url: &str, did: &str) -> Result<(), Box<dyn std::error::Error>> {
-//     let mut client = TwinApiClient::connect(host_url.to_string()).await?;
-
-//     let headers = Headers {
-//         client_app_id: "sub-id".to_string(),
-//         transaction_ref: vec!["test".to_string()],
-//         ..Default::default()
-//     };
-
-//     let args = Arguments {
-//         twin_id: Some(TwinId {
-//             value: did.to_string(),
-//         }),
-//         ..Default::default()
-//     };
-
-//     let mut request = tonic::Request::new(DescribeTwinRequest {
-//         lang: Some("en".to_string()),
-//         headers: Some(headers),
-//         args: Some(args),
-//         ..Default::default()
-//     });
-
-//     let token = format!("bearer {}", get_token());
-
-//     request
-//         .metadata_mut()
-//         .append("authorization", token.parse().expect("Failed to parse token"));
-
-//     let result = client.describe_twin(request).await?;
-//     println!("result = {:?}", result);
-
-//     Ok(())
-// }
