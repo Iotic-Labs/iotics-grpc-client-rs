@@ -33,7 +33,7 @@ use prost_types::Timestamp;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use tokio::sync::mpsc::{channel, Receiver};
-use tonic::transport::Channel;
+pub use tonic::transport::Channel;
 pub use tonic::Streaming;
 
 pub use common::{
@@ -44,7 +44,7 @@ pub use common::{
 use feed::create_feed_request::{
     Arguments as CreateFeedRequestArguments, Payload as CreateFeedRequestPayload,
 };
-use feed::feed_api_client::FeedApiClient;
+pub use feed::feed_api_client::FeedApiClient;
 use feed::share_feed_data_request::{
     Arguments as ShareFeedDataRequestArguments, Payload as ShareFeedDataRequestPayload,
 };
@@ -138,15 +138,13 @@ pub async fn create_update_twin_with_feeds(
     Ok(did)
 }
 
-pub async fn share_data(
-    api_config: &Config,
-    token: String,
+pub async fn share_data_with_channel(
+    client: &mut FeedApiClient<Channel>,
+    token: &str,
     twin_did: &str,
     feed_id: &str,
     data: Vec<u8>,
 ) -> Result<(), anyhow::Error> {
-    let mut client = FeedApiClient::connect(api_config.host_address.clone()).await?;
-
     let twin_id = TwinId {
         value: twin_did.to_string(),
     };
@@ -197,6 +195,18 @@ pub async fn share_data(
         .context("share data failed")?;
 
     Ok(())
+}
+
+pub async fn share_data(
+    api_config: &Config,
+    token: &str,
+    twin_did: &str,
+    feed_id: &str,
+    data: Vec<u8>,
+) -> Result<(), anyhow::Error> {
+    let mut client = FeedApiClient::connect(api_config.host_address.clone()).await?;
+
+    share_data_with_channel(&mut client, token, twin_did, feed_id, data).await
 }
 
 pub async fn create_update_feed(
