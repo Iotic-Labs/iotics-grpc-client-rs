@@ -1,5 +1,6 @@
 mod helpers;
 
+#[allow(clippy::module_inception)]
 mod api {
     pub mod common;
     pub mod feed;
@@ -64,35 +65,8 @@ use api::twin::{
     CreateTwinRequest, DeleteTwinRequest, GeoLocationUpdate, PropertyUpdate, UpdateTwinRequest,
     VisibilityUpdate,
 };
-pub use iotics_identity::Config;
 
 use crate::helpers::generate_client_app_id;
-
-pub fn get_api_config() -> Config {
-    dotenv::dotenv().ok();
-
-    let parse_env =
-        |key: &str| -> String { std::env::var(key).expect(&format!("env var {}", key)) };
-
-    let api_config = Config {
-        host_address: parse_env("IOTICS_HOST_ADDRESS"),
-        resolver_address: parse_env("IOTICS_RESOLVER_ADDRESS"),
-        token_duration: parse_env("IOTICS_TOKEN_DURATION")
-            .parse::<i64>()
-            .expect("Failed to parse duration"),
-        user_did: parse_env("IOTICS_USER_DID"),
-        agent_did: parse_env("IOTICS_AGENT_DID"),
-        agent_key_name: parse_env("IOTICS_AGENT_KEY_NAME"),
-        agent_secret: parse_env("IOTICS_AGENT_SECRET"),
-    };
-
-    api_config
-}
-
-pub fn get_token(config: &Config) -> String {
-    let token = iotics_identity::new_authentication_token(&config);
-    format!("bearer {}", token)
-}
 
 #[derive(Debug, Clone)]
 pub struct TwinFeed {
@@ -101,32 +75,24 @@ pub struct TwinFeed {
     pub values: Vec<FeedValue>,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub async fn create_update_twin_with_feeds(
-    api_config: &Config,
-    token: String,
-    seed: String,
-    label: String,
+    host_address: &str,
+    token: &str,
+    did: &str,
+    label: &str,
     properties: Vec<Property>,
     tags: Vec<String>,
     feeds: Vec<TwinFeed>,
     location: Option<GeoLocation>,
-) -> Result<String, anyhow::Error> {
-    let did = create_update_twin(
-        api_config,
-        token.clone(),
-        seed,
-        label,
-        properties,
-        tags,
-        location,
-    )
-    .await?;
+) -> Result<(), anyhow::Error> {
+    create_update_twin(host_address, token, did, label, properties, tags, location).await?;
 
     for feed in feeds {
-        create_update_feed(api_config, token.clone(), &did, &feed).await?;
+        create_update_feed(host_address, token, did, &feed).await?;
     }
 
-    Ok(did)
+    Ok(())
 }
 
 pub async fn share_data_with_channel(
@@ -172,7 +138,6 @@ pub async fn share_data_with_channel(
         headers: Some(headers.clone()),
         args: Some(args),
         payload: Some(payload),
-        ..Default::default()
     });
 
     request.metadata_mut().append(
@@ -189,24 +154,24 @@ pub async fn share_data_with_channel(
 }
 
 pub async fn share_data(
-    api_config: &Config,
+    host_address: &str,
     token: &str,
     twin_did: &str,
     feed_id: &str,
     data: Vec<u8>,
 ) -> Result<(), anyhow::Error> {
-    let mut client = FeedApiClient::connect(api_config.host_address.clone()).await?;
+    let mut client = FeedApiClient::connect(host_address.to_string()).await?;
 
     share_data_with_channel(&mut client, token, twin_did, feed_id, data).await
 }
 
 pub async fn create_update_feed(
-    api_config: &Config,
-    token: String,
+    host_address: &str,
+    token: &str,
     did: &str,
     feed: &TwinFeed,
 ) -> Result<(), anyhow::Error> {
-    let mut client = FeedApiClient::connect(api_config.host_address.clone()).await?;
+    let mut client = FeedApiClient::connect(host_address.to_string()).await?;
 
     let twin_id = TwinId {
         value: did.to_string(),
@@ -238,7 +203,6 @@ pub async fn create_update_feed(
         headers: Some(headers.clone()),
         args: Some(args),
         payload: Some(payload),
-        ..Default::default()
     });
 
     request.metadata_mut().append(
@@ -280,7 +244,6 @@ pub async fn create_update_feed(
         headers: Some(headers),
         args: Some(args),
         payload: Some(payload),
-        ..Default::default()
     });
 
     request.metadata_mut().append(
@@ -297,22 +260,18 @@ pub async fn create_update_feed(
 }
 
 pub async fn create_update_twin(
-    api_config: &Config,
-    token: String,
-    seed: String,
-    label: String,
+    host_address: &str,
+    token: &str,
+    did: &str,
+    label: &str,
     properties: Vec<Property>,
     tags: Vec<String>,
     location: Option<GeoLocation>,
 ) -> Result<String, anyhow::Error> {
-    let mut client = TwinApiClient::connect(api_config.host_address.clone()).await?;
+    let mut client = TwinApiClient::connect(host_address.to_string()).await?;
 
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
-
-    let did = iotics_identity::new_twin_did(&api_config, seed)
-        .await
-        .context("create did failed")?;
 
     let headers = Headers {
         client_app_id: client_app_id.clone(),
@@ -320,17 +279,17 @@ pub async fn create_update_twin(
         ..Default::default()
     };
 
-    let twin_id = TwinId { value: did.clone() };
+    let twin_id = TwinId {
+        value: did.to_string(),
+    };
 
     let payload = CreateTwinRequestPayload {
         twin_id: Some(twin_id.clone()),
-        ..Default::default()
     };
 
     let mut request = tonic::Request::new(CreateTwinRequest {
         headers: Some(headers.clone()),
         payload: Some(payload),
-        ..Default::default()
     });
 
     request.metadata_mut().append(
@@ -351,7 +310,7 @@ pub async fn create_update_twin(
         labels: Some(LabelUpdate {
             added: vec![LangLiteral {
                 lang: "en".to_string(),
-                value: label,
+                value: label.to_string(),
             }],
             ..Default::default()
         }),
@@ -380,7 +339,6 @@ pub async fn create_update_twin(
         headers: Some(headers),
         args: Some(args),
         payload: Some(payload),
-        ..Default::default()
     });
 
     request.metadata_mut().append(
@@ -393,24 +351,22 @@ pub async fn create_update_twin(
         .await
         .context("update twin failed")?;
 
-    Ok(did)
+    Ok(did.to_string())
 }
 
-pub async fn delete_twin(
-    api_config: &Config,
-    token: String,
-    did: String,
-) -> Result<(), anyhow::Error> {
-    let mut client = TwinApiClient::connect(api_config.host_address.clone()).await?;
+pub async fn delete_twin(host_address: &str, token: &str, did: &str) -> Result<(), anyhow::Error> {
+    let mut client = TwinApiClient::connect(host_address.to_string()).await?;
 
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
-    let twin_id = TwinId { value: did };
+    let twin_id = TwinId {
+        value: did.to_string(),
+    };
 
     let headers = Headers {
-        client_app_id: client_app_id,
-        transaction_ref: transaction_ref,
+        client_app_id,
+        transaction_ref,
         ..Default::default()
     };
 
@@ -421,7 +377,6 @@ pub async fn delete_twin(
     let mut request = tonic::Request::new(DeleteTwinRequest {
         headers: Some(headers),
         args: Some(args),
-        ..Default::default()
     });
 
     request.metadata_mut().append(
@@ -438,11 +393,11 @@ pub async fn delete_twin(
 }
 
 pub async fn search(
-    api_config: &Config,
-    token: String,
+    host_address: &str,
+    token: &str,
     filter: Filter,
-) -> Result<Receiver<SearchResponse>, Box<dyn std::error::Error>> {
-    let client = SearchApiClient::connect(api_config.host_address.clone()).await?;
+) -> Result<Receiver<SearchResponse>, anyhow::Error> {
+    let client = SearchApiClient::connect(host_address.to_string()).await?;
 
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
@@ -450,13 +405,14 @@ pub async fn search(
     let (tx, rx) = channel::<SearchResponse>(10000);
 
     let results_client = client.clone();
-    let results_token = token.clone();
+    let results_token = token.to_string();
     let results_client_app_id = client_app_id.clone();
     let results_transaction_ref = transaction_ref.clone();
     let results_filter = filter.clone();
 
     let page = Arc::new(AtomicU32::new(0));
 
+    // TODO: rework this so that it returns the error instead of panicking
     let fut = async move {
         let mut request = tonic::Request::new(SubscriptionHeaders {
             client_app_id: results_client_app_id.clone(),
@@ -476,7 +432,7 @@ pub async fn search(
             .clone()
             .receive_all_search_responses(request)
             .await
-            .unwrap()
+            .expect("failed to open the results stream")
             .into_inner();
 
         while let Ok(Some(result)) = stream.message().await {
@@ -484,50 +440,50 @@ pub async fn search(
                 if payload.twins.len() >= PAGE_SIZE as usize {
                     let current_page = page.load(Ordering::SeqCst);
 
-                    if &result.headers.as_ref().unwrap().client_ref
-                        == &format!("{}_{}", &results_client_app_id, current_page)
+                    if result.headers.as_ref().unwrap().client_ref
+                        == format!("{}_{}", &results_client_app_id, current_page)
                     {
                         search_page(
                             results_client.clone(),
-                            results_token.clone(),
+                            &results_token,
                             results_filter.clone(),
                             results_client_app_id.clone(),
                             results_transaction_ref.clone(),
                             current_page + 1,
                         )
                         .await
-                        .unwrap();
+                        .expect("failed to request the next page");
 
                         page.fetch_add(1, Ordering::SeqCst);
                     }
                 }
             }
 
-            tx.send(result).await.unwrap();
+            tx.send(result)
+                .await
+                .expect("failed to stream back the result");
         }
     };
 
     tokio::spawn(fut);
 
-    search_page(client, token, filter, client_app_id, transaction_ref, 0)
-        .await
-        .unwrap();
+    search_page(client, token, filter, client_app_id, transaction_ref, 0).await?;
 
     Ok(rx)
 }
 
 async fn search_page(
     mut client: SearchApiClient<Channel>,
-    token: String,
+    token: &str,
     filter: Filter,
     client_app_id: String,
     transaction_ref: Vec<String>,
     page: u32,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<(), anyhow::Error> {
     let headers = Headers {
         client_app_id: client_app_id.clone(),
         client_ref: format!("{}_{}", client_app_id, page),
-        transaction_ref: transaction_ref,
+        transaction_ref,
         ..Default::default()
     };
 
@@ -548,7 +504,6 @@ async fn search_page(
                 value: PAGE_SIZE * page,
             }),
         }),
-        ..Default::default()
     });
 
     request.metadata_mut().append(
@@ -556,20 +511,23 @@ async fn search_page(
         token.parse().expect("Failed to parse token"),
     );
 
-    client.dispatch_search_request(request).await.unwrap();
+    client
+        .dispatch_search_request(request)
+        .await
+        .context("failed to dispatch the search request")?;
 
     Ok(())
 }
 
 pub async fn follow(
-    api_config: &Config,
+    host_address: &str,
     token: &str,
     followed_host_id: Option<HostId>,
     followed_twin_id: TwinId,
     followed_feed: String,
     follower_twin_id: TwinId,
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
-    let mut client = InterestApiClient::connect(api_config.host_address.clone()).await?;
+    let mut client = InterestApiClient::connect(host_address.to_string()).await?;
 
     follow_with_channel(
         &mut client,
