@@ -1,30 +1,21 @@
-mod search {
-    tonic::include_proto!("search");
-}
+mod helpers;
 
-mod common {
-    tonic::include_proto!("common");
-}
+mod api {
+    pub mod common;
+    pub mod feed;
+    pub mod interest;
+    pub mod search;
+    pub mod twin;
 
-mod twin {
-    tonic::include_proto!("twin");
-}
+    #[path = ""]
+    pub mod google {
+        #[path = "google.rpc.rs"]
+        pub mod rpc;
 
-mod feed {
-    tonic::include_proto!("feed");
-}
-
-mod interest {
-    tonic::include_proto!("interest");
-}
-
-mod google {
-    pub mod rpc {
-        tonic::include_proto!("google.rpc");
+        #[path = "google.protobuf.rs"]
+        pub mod protobuf;
     }
 }
-
-mod helpers;
 
 const PAGE_SIZE: u32 = 100;
 
@@ -36,44 +27,44 @@ use tokio::sync::mpsc::{channel, Receiver};
 pub use tonic::transport::Channel;
 pub use tonic::Streaming;
 
-pub use common::{
+pub use api::common::{
     property::Value, FeedData, FeedId, GeoCircle, GeoLocation, Headers, HostId, LabelUpdate,
     LangLiteral, Limit, Literal, Offset, Property, Range, Scope, StringLiteral,
     SubscriptionHeaders, Tags, TwinId, Uri, Value as FeedValue, Values as FeedValues, Visibility,
 };
-use feed::create_feed_request::{
+use api::feed::create_feed_request::{
     Arguments as CreateFeedRequestArguments, Payload as CreateFeedRequestPayload,
 };
-pub use feed::feed_api_client::FeedApiClient;
-use feed::share_feed_data_request::{
+pub use api::feed::feed_api_client::FeedApiClient;
+use api::feed::share_feed_data_request::{
     Arguments as ShareFeedDataRequestArguments, Payload as ShareFeedDataRequestPayload,
 };
-use feed::update_feed_request::{
+use api::feed::update_feed_request::{
     Arguments as UpdateFeedRequestArguments, Payload as UpdateFeedRequestPayload,
 };
-use feed::Feed;
-use feed::{CreateFeedRequest, ShareFeedDataRequest, UpdateFeedRequest};
-use interest::fetch_interest_request::Arguments;
-use interest::interest::FollowedFeed;
-pub use interest::interest_api_client::InterestApiClient;
-use interest::Interest;
-pub use interest::{FetchInterestRequest, FetchInterestResponse};
-pub use iotics_identity::Config;
-use search::search_api_client::SearchApiClient;
-pub use search::search_request::payload::Filter;
-use search::search_request::Payload;
-pub use search::search_response::TwinDetails;
-pub use search::{ResponseType, SearchRequest, SearchResponse};
-use twin::create_twin_request::Payload as CreateTwinRequestPayload;
-use twin::delete_twin_request::Arguments as DeleteTwinRequestArguments;
-use twin::twin_api_client::TwinApiClient;
-use twin::update_twin_request::{
+use api::feed::Feed;
+use api::feed::{CreateFeedRequest, ShareFeedDataRequest, UpdateFeedRequest};
+use api::interest::fetch_interest_request::Arguments;
+use api::interest::interest::FollowedFeed;
+pub use api::interest::interest_api_client::InterestApiClient;
+use api::interest::Interest;
+pub use api::interest::{FetchInterestRequest, FetchInterestResponse};
+use api::search::search_api_client::SearchApiClient;
+pub use api::search::search_request::payload::Filter;
+use api::search::search_request::Payload;
+pub use api::search::search_response::TwinDetails;
+pub use api::search::{ResponseType, SearchRequest, SearchResponse};
+use api::twin::create_twin_request::Payload as CreateTwinRequestPayload;
+use api::twin::delete_twin_request::Arguments as DeleteTwinRequestArguments;
+use api::twin::twin_api_client::TwinApiClient;
+use api::twin::update_twin_request::{
     Arguments as UpdateTwinRequestArguments, Payload as UpdateTwinRequestPayload,
 };
-use twin::{
+use api::twin::{
     CreateTwinRequest, DeleteTwinRequest, GeoLocationUpdate, PropertyUpdate, UpdateTwinRequest,
     VisibilityUpdate,
 };
+pub use iotics_identity::Config;
 
 use crate::helpers::generate_client_app_id;
 
