@@ -61,9 +61,10 @@ use api::twin::twin_api_client::TwinApiClient;
 use api::twin::update_twin_request::{
     Arguments as UpdateTwinRequestArguments, Payload as UpdateTwinRequestPayload,
 };
+pub use api::twin::ListAllTwinsResponse;
 use api::twin::{
-    CreateTwinRequest, DeleteTwinRequest, GeoLocationUpdate, PropertyUpdate, UpdateTwinRequest,
-    VisibilityUpdate,
+    CreateTwinRequest, DeleteTwinRequest, GeoLocationUpdate, ListAllTwinsRequest, PropertyUpdate,
+    UpdateTwinRequest, VisibilityUpdate,
 };
 
 use crate::helpers::generate_client_app_id;
@@ -267,7 +268,7 @@ pub async fn create_update_twin(
     properties: Vec<Property>,
     tags: Vec<String>,
     location: Option<GeoLocation>,
-) -> Result<String, anyhow::Error> {
+) -> Result<(), anyhow::Error> {
     let mut client = TwinApiClient::connect(host_address.to_string()).await?;
 
     let client_app_id = generate_client_app_id();
@@ -351,7 +352,7 @@ pub async fn create_update_twin(
         .await
         .context("update twin failed")?;
 
-    Ok(did.to_string())
+    Ok(())
 }
 
 pub async fn delete_twin(host_address: &str, token: &str, did: &str) -> Result<(), anyhow::Error> {
@@ -587,4 +588,39 @@ pub async fn follow_with_channel(
         .into_inner();
 
     Ok(stream)
+}
+
+pub async fn list_all_twins(
+    host_address: &str,
+    token: &str,
+) -> Result<ListAllTwinsResponse, anyhow::Error> {
+    let mut client = TwinApiClient::connect(host_address.to_string()).await?;
+
+    let client_app_id = generate_client_app_id();
+    let transaction_ref = vec![client_app_id.clone()];
+
+    let headers = Headers {
+        client_app_id: client_app_id.clone(),
+        transaction_ref: transaction_ref.clone(),
+        ..Default::default()
+    };
+
+    let mut request = tonic::Request::new(ListAllTwinsRequest {
+        headers: Some(headers.clone()),
+        range: None,
+    });
+
+    request.metadata_mut().append(
+        "authorization",
+        token.parse().context("parse token failed")?,
+    );
+
+    let result = client
+        .list_all_twins(request)
+        .await
+        .context("create twin failed")?;
+
+    let result = result.into_inner();
+
+    Ok(result)
 }
