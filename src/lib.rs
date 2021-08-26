@@ -26,6 +26,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc::{channel, Receiver};
+use tonic::metadata::{Ascii, MetadataValue};
 pub use tonic::transport::Channel;
 pub use tonic::Streaming;
 
@@ -160,10 +161,7 @@ pub async fn share_data_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    client
-        .share_feed_data(request)
-        .await
-        .context("share data failed")?;
+    client.share_feed_data(request).await?;
 
     Ok(())
 }
@@ -300,10 +298,7 @@ pub async fn create_update_twin(
         token.parse().context("parse token failed")?,
     );
 
-    client
-        .create_twin(request)
-        .await
-        .context("create twin failed")?;
+    client.create_twin(request).await?;
 
     let args = UpdateTwinRequestArguments {
         twin_id: Some(twin_id.clone()),
@@ -349,10 +344,7 @@ pub async fn create_update_twin(
         token.parse().context("parse token failed")?,
     );
 
-    client
-        .update_twin(request)
-        .await
-        .context("update twin failed")?;
+    client.update_twin(request).await?;
 
     Ok(())
 }
@@ -387,10 +379,7 @@ pub async fn delete_twin(host_address: &str, token: &str, did: &str) -> Result<(
         token.parse().context("parse token failed")?,
     );
 
-    client
-        .delete_twin(request)
-        .await
-        .context("delete twin failed")?;
+    client.delete_twin(request).await?;
 
     Ok(())
 }
@@ -401,13 +390,13 @@ pub async fn search(
     filter: Filter,
     scope: Scope,
     timeout: Option<Duration>,
-) -> Result<Receiver<SearchResponse>, anyhow::Error> {
+) -> Result<Receiver<Result<SearchResponse, anyhow::Error>>, anyhow::Error> {
     let client = SearchApiClient::connect(host_address.to_string()).await?;
 
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
-    let (tx, rx) = channel::<SearchResponse>(10000);
+    let (tx, rx) = channel::<Result<SearchResponse, anyhow::Error>>(16384);
 
     let results_client = client.clone();
     let results_token = token.to_string();
@@ -417,7 +406,6 @@ pub async fn search(
 
     let page = Arc::new(AtomicU32::new(0));
 
-    // TODO: rework this so that it returns the error instead of panicking
     let fut = async move {
         let mut request = tonic::Request::new(SubscriptionHeaders {
             client_app_id: results_client_app_id.clone(),
@@ -425,49 +413,68 @@ pub async fn search(
             ..Default::default()
         });
 
-        request.metadata_mut().append(
-            "authorization",
-            results_token
-                .clone()
-                .parse()
-                .expect("Failed to parse token"),
-        );
+        let token: Result<MetadataValue<Ascii>, _> =
+            results_token.clone().parse().context("parse token failed");
 
-        let mut stream = results_client
-            .clone()
-            .receive_all_search_responses(request)
-            .await
-            .expect("failed to open the results stream")
-            .into_inner();
+        match token {
+            Ok(token) => {
+                request.metadata_mut().append("authorization", token);
 
-        while let Ok(Some(result)) = stream.message().await {
-            if let Some(payload) = &result.payload {
-                if payload.twins.len() >= PAGE_SIZE as usize {
-                    let current_page = page.load(Ordering::SeqCst);
+                let stream = results_client
+                    .clone()
+                    .receive_all_search_responses(request)
+                    .await;
 
-                    if result.headers.as_ref().unwrap().client_ref
-                        == format!("{}_{}", &results_client_app_id, current_page)
-                    {
-                        search_page(
-                            results_client.clone(),
-                            &results_token,
-                            results_filter.clone(),
-                            scope,
-                            current_page + 1,
-                            results_client_app_id.clone(),
-                            results_transaction_ref.clone(),
-                        )
-                        .await
-                        .expect("failed to request the next page");
+                match stream {
+                    Ok(mut stream) => {
+                        let stream = stream.get_mut();
 
-                        page.fetch_add(1, Ordering::SeqCst);
+                        while let Ok(Some(result)) = stream.message().await {
+                            if let Some(payload) = &result.payload {
+                                if payload.twins.len() >= PAGE_SIZE as usize {
+                                    let page_result = async {
+                                        let current_page = page.load(Ordering::SeqCst);
+
+                                        if result.headers.as_ref().unwrap().client_ref
+                                            == format!(
+                                                "{}_{}",
+                                                &results_client_app_id, current_page
+                                            )
+                                        {
+                                            search_page(
+                                                results_client.clone(),
+                                                &results_token,
+                                                results_filter.clone(),
+                                                scope,
+                                                current_page + 1,
+                                                results_client_app_id.clone(),
+                                                results_transaction_ref.clone(),
+                                            )
+                                            .await?;
+
+                                            page.fetch_add(1, Ordering::SeqCst);
+                                        }
+
+                                        Ok(result)
+                                    }
+                                    .await;
+
+                                    // ignore the potential error, the stream must be closed
+                                    let _ = tx.send(page_result).await;
+                                }
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        // ignore the potential error, the stream must be closed
+                        let _ = tx.send(Err(e.into())).await;
                     }
                 }
             }
-
-            tx.send(result)
-                .await
-                .expect("failed to stream back the result");
+            Err(e) => {
+                // ignore the potential error, the stream must be closed
+                let _ = tx.send(Err(e)).await;
+            }
         }
     };
 
@@ -534,10 +541,7 @@ async fn search_page(
         token.parse().expect("Failed to parse token"),
     );
 
-    client
-        .dispatch_search_request(request)
-        .await
-        .context("failed to dispatch the search request")?;
+    client.dispatch_search_request(request).await?;
 
     Ok(())
 }
@@ -603,11 +607,7 @@ pub async fn follow_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    let stream = client
-        .fetch_interests(request)
-        .await
-        .context("follow feed failed")?
-        .into_inner();
+    let stream = client.fetch_interests(request).await?.into_inner();
 
     Ok(stream)
 }
@@ -644,10 +644,7 @@ pub async fn list_all_twins_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    let result = client
-        .list_all_twins(request)
-        .await
-        .context("create twin failed")?;
+    let result = client.list_all_twins(request).await?;
 
     let result = result.into_inner();
 
