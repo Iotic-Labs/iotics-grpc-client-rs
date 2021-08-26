@@ -399,6 +399,7 @@ pub async fn search(
     host_address: &str,
     token: &str,
     filter: Filter,
+    scope: Scope,
     timeout: Option<Duration>,
 ) -> Result<Receiver<SearchResponse>, anyhow::Error> {
     let client = SearchApiClient::connect(host_address.to_string()).await?;
@@ -451,9 +452,10 @@ pub async fn search(
                             results_client.clone(),
                             &results_token,
                             results_filter.clone(),
+                            scope,
+                            current_page + 1,
                             results_client_app_id.clone(),
                             results_transaction_ref.clone(),
-                            current_page + 1,
                         )
                         .await
                         .expect("failed to request the next page");
@@ -478,7 +480,16 @@ pub async fn search(
         });
     }
 
-    search_page(client, token, filter, client_app_id, transaction_ref, 0).await?;
+    search_page(
+        client,
+        token,
+        filter,
+        scope,
+        0,
+        client_app_id,
+        transaction_ref,
+    )
+    .await?;
 
     Ok(rx)
 }
@@ -487,9 +498,10 @@ async fn search_page(
     mut client: SearchApiClient<Channel>,
     token: &str,
     filter: Filter,
+    scope: Scope,
+    page: u32,
     client_app_id: String,
     transaction_ref: Vec<String>,
-    page: u32,
 ) -> Result<(), anyhow::Error> {
     let headers = Headers {
         client_app_id: client_app_id.clone(),
@@ -506,7 +518,7 @@ async fn search_page(
 
     let mut request = tonic::Request::new(SearchRequest {
         lang: Some("en".to_string()),
-        scope: Scope::Global as i32,
+        scope: scope as i32,
         payload: Some(payload),
         headers: Some(headers),
         range: Some(Range {
