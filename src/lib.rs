@@ -24,6 +24,7 @@ use anyhow::Context;
 use prost_types::Timestamp;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::mpsc::{channel, Receiver};
 pub use tonic::transport::Channel;
 pub use tonic::Streaming;
@@ -57,15 +58,16 @@ pub use api::search::search_response::TwinDetails;
 pub use api::search::{ResponseType, SearchRequest, SearchResponse};
 use api::twin::create_twin_request::Payload as CreateTwinRequestPayload;
 use api::twin::delete_twin_request::Arguments as DeleteTwinRequestArguments;
-use api::twin::twin_api_client::TwinApiClient;
+use api::twin::describe_twin_request::Arguments as DescribeTwinRequestArguments;
+pub use api::twin::twin_api_client::TwinApiClient;
 use api::twin::update_twin_request::{
     Arguments as UpdateTwinRequestArguments, Payload as UpdateTwinRequestPayload,
 };
-pub use api::twin::ListAllTwinsResponse;
 use api::twin::{
-    CreateTwinRequest, DeleteTwinRequest, GeoLocationUpdate, ListAllTwinsRequest, PropertyUpdate,
-    UpdateTwinRequest, VisibilityUpdate,
+    CreateTwinRequest, DeleteTwinRequest, DescribeTwinRequest, GeoLocationUpdate,
+    ListAllTwinsRequest, PropertyUpdate, UpdateTwinRequest, VisibilityUpdate,
 };
+pub use api::twin::{DescribeTwinResponse, ListAllTwinsResponse, Twin};
 
 use crate::helpers::generate_client_app_id;
 
@@ -96,7 +98,19 @@ pub async fn create_update_twin_with_feeds(
     Ok(())
 }
 
-pub async fn share_data_with_channel(
+pub async fn share_data(
+    host_address: &str,
+    token: &str,
+    twin_did: &str,
+    feed_id: &str,
+    data: Vec<u8>,
+) -> Result<(), anyhow::Error> {
+    let mut client = FeedApiClient::connect(host_address.to_string()).await?;
+
+    share_data_with_client(&mut client, token, twin_did, feed_id, data).await
+}
+
+pub async fn share_data_with_client(
     client: &mut FeedApiClient<Channel>,
     token: &str,
     twin_did: &str,
@@ -152,18 +166,6 @@ pub async fn share_data_with_channel(
         .context("share data failed")?;
 
     Ok(())
-}
-
-pub async fn share_data(
-    host_address: &str,
-    token: &str,
-    twin_did: &str,
-    feed_id: &str,
-    data: Vec<u8>,
-) -> Result<(), anyhow::Error> {
-    let mut client = FeedApiClient::connect(host_address.to_string()).await?;
-
-    share_data_with_channel(&mut client, token, twin_did, feed_id, data).await
 }
 
 pub async fn create_update_feed(
@@ -397,6 +399,7 @@ pub async fn search(
     host_address: &str,
     token: &str,
     filter: Filter,
+    timeout: Option<Duration>,
 ) -> Result<Receiver<SearchResponse>, anyhow::Error> {
     let client = SearchApiClient::connect(host_address.to_string()).await?;
 
@@ -466,7 +469,14 @@ pub async fn search(
         }
     };
 
-    tokio::spawn(fut);
+    let handle = tokio::spawn(fut);
+
+    if let Some(timeout) = timeout {
+        tokio::spawn(async move {
+            tokio::time::sleep(timeout).await;
+            handle.abort();
+        });
+    }
 
     search_page(client, token, filter, client_app_id, transaction_ref, 0).await?;
 
@@ -530,7 +540,7 @@ pub async fn follow(
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
     let mut client = InterestApiClient::connect(host_address.to_string()).await?;
 
-    follow_with_channel(
+    follow_with_client(
         &mut client,
         token,
         followed_host_id,
@@ -541,7 +551,7 @@ pub async fn follow(
     .await
 }
 
-pub async fn follow_with_channel(
+pub async fn follow_with_client(
     client: &mut InterestApiClient<Channel>,
     token: &str,
     followed_host_id: Option<HostId>,
@@ -596,6 +606,13 @@ pub async fn list_all_twins(
 ) -> Result<ListAllTwinsResponse, anyhow::Error> {
     let mut client = TwinApiClient::connect(host_address.to_string()).await?;
 
+    list_all_twins_with_client(&mut client, token).await
+}
+
+pub async fn list_all_twins_with_client(
+    client: &mut TwinApiClient<Channel>,
+    token: &str,
+) -> Result<ListAllTwinsResponse, anyhow::Error> {
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
@@ -619,6 +636,44 @@ pub async fn list_all_twins(
         .list_all_twins(request)
         .await
         .context("create twin failed")?;
+
+    let result = result.into_inner();
+
+    Ok(result)
+}
+
+pub async fn describe_twin_with_client(
+    client: &mut TwinApiClient<Channel>,
+    token: &str,
+    twin_id: TwinId,
+    remote_host_id: Option<HostId>,
+) -> Result<DescribeTwinResponse, anyhow::Error> {
+    let client_app_id = generate_client_app_id();
+    let transaction_ref = vec![client_app_id.clone()];
+
+    let headers = Headers {
+        client_app_id: client_app_id.clone(),
+        transaction_ref: transaction_ref.clone(),
+        ..Default::default()
+    };
+
+    let args = DescribeTwinRequestArguments {
+        twin_id: Some(twin_id),
+        remote_host_id,
+    };
+
+    let mut request = tonic::Request::new(DescribeTwinRequest {
+        headers: Some(headers.clone()),
+        args: Some(args),
+        lang: None,
+    });
+
+    request.metadata_mut().append(
+        "authorization",
+        token.parse().context("parse token failed")?,
+    );
+
+    let result = client.describe_twin(request).await?;
 
     let result = result.into_inner();
 
