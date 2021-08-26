@@ -3,6 +3,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .out_dir("src/api")
         .build_server(false)
         .format(true)
+        .type_attribute(
+            ".common.Uri",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+        )
+        .type_attribute(
+            ".common.StringLiteral",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+        )
+        .type_attribute(
+            ".common.LangLiteral",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+        )
+        .type_attribute(
+            ".common.Literal",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+        )
+        .type_attribute(
+            ".common.Property.Value",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+        )
+        .type_attribute(
+            ".common.Property",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+        )
         .compile(
             &[
                 "proto/common/service.proto",
