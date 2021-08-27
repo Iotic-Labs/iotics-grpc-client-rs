@@ -432,36 +432,36 @@ pub async fn search(
                         while let Ok(Some(result)) = stream.message().await {
                             if let Some(payload) = &result.payload {
                                 if payload.twins.len() >= PAGE_SIZE as usize {
-                                    let page_result = async {
-                                        let current_page = page.load(Ordering::SeqCst);
+                                    let current_page = page.load(Ordering::SeqCst);
 
-                                        if result.headers.as_ref().unwrap().client_ref
-                                            == format!(
-                                                "{}_{}",
-                                                &results_client_app_id, current_page
-                                            )
-                                        {
-                                            search_page(
-                                                results_client.clone(),
-                                                &results_token,
-                                                results_filter.clone(),
-                                                scope,
-                                                current_page + 1,
-                                                results_client_app_id.clone(),
-                                                results_transaction_ref.clone(),
-                                            )
-                                            .await?;
+                                    if result.headers.as_ref().unwrap().client_ref
+                                        == format!("{}_{}", &results_client_app_id, current_page)
+                                    {
+                                        let response = search_page(
+                                            results_client.clone(),
+                                            &results_token,
+                                            results_filter.clone(),
+                                            scope,
+                                            current_page + 1,
+                                            results_client_app_id.clone(),
+                                            results_transaction_ref.clone(),
+                                        )
+                                        .await;
 
-                                            page.fetch_add(1, Ordering::SeqCst);
+                                        match response {
+                                            Ok(_) => {
+                                                page.fetch_add(1, Ordering::SeqCst);
+                                            }
+                                            Err(e) => {
+                                                // ignore the potential error, the stream must be closed
+                                                let _ = tx.send(Err(e)).await;
+                                            }
                                         }
-
-                                        Ok(result)
                                     }
-                                    .await;
-
-                                    // ignore the potential error, the stream must be closed
-                                    let _ = tx.send(page_result).await;
                                 }
+
+                                // ignore the potential error, the stream must be closed
+                                let _ = tx.send(Ok(result)).await;
                             }
                         }
                     }
