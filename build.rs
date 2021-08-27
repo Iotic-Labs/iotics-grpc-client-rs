@@ -27,6 +27,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ".common.Property",
             "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
         )
+        .type_attribute(
+            ".common.GeoLocation",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+        )
+        .type_attribute(
+            ".common.GeoCircle",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+        )
+        .type_attribute(
+            ".search.SearchRequest.Payload.Filter",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+        )
         .compile(
             &[
                 "proto/common/service.proto",

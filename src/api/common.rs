@@ -104,6 +104,8 @@ pub mod property {
     }
 }
 /// GeoLocation is the geographic location of a Twin.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GeoLocation {
     /// Latitude
@@ -114,6 +116,8 @@ pub struct GeoLocation {
     pub lon: f64,
 }
 /// GeoCircle is an approximate geographic location.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GeoCircle {
     #[prost(message, optional, tag = "1")]

@@ -35,6 +35,8 @@ pub mod search_request {
     /// Nested message and enum types in `Payload`.
     pub mod payload {
         /// Search request filters, any of these can be used in combination or on their own.
+        #[derive(serde::Serialize, serde::Deserialize)]
+        #[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct Filter {
             /// Text filtering. One or more keywords which must match either text from twin/feed labels/comments (in the given
