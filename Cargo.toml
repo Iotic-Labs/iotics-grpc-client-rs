@@ -5,7 +5,7 @@ authors = ["Mihai Dinculescu <mihai.dinculescu@iotic-labs.com>"]
 edition = "2018"
 
 [dependencies]
-tonic = "0.5"
+tonic = { version = "0.5", features = ["tls-roots"] }
 prost = "0.8"
 prost-types = "0.8"
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread", "time"] }

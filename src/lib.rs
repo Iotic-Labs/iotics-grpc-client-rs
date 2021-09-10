@@ -28,6 +28,7 @@ use std::time::Duration;
 use tokio::sync::mpsc::{channel, Receiver};
 use tonic::metadata::{Ascii, MetadataValue};
 pub use tonic::transport::Channel;
+use tonic::transport::ClientTlsConfig;
 pub use tonic::Streaming;
 
 pub use api::common::{
@@ -38,6 +39,7 @@ pub use api::common::{
 use api::feed::create_feed_request::{
     Arguments as CreateFeedRequestArguments, Payload as CreateFeedRequestPayload,
 };
+use api::feed::describe_feed_request::Arguments as DescribeFeedRequestArguments;
 pub use api::feed::feed_api_client::FeedApiClient;
 use api::feed::share_feed_data_request::{
     Arguments as ShareFeedDataRequestArguments, Payload as ShareFeedDataRequestPayload,
@@ -45,8 +47,9 @@ use api::feed::share_feed_data_request::{
 use api::feed::update_feed_request::{
     Arguments as UpdateFeedRequestArguments, Payload as UpdateFeedRequestPayload,
 };
+pub use api::feed::DescribeFeedResponse;
 use api::feed::Feed;
-use api::feed::{CreateFeedRequest, ShareFeedDataRequest, UpdateFeedRequest};
+use api::feed::{CreateFeedRequest, DescribeFeedRequest, ShareFeedDataRequest, UpdateFeedRequest};
 use api::interest::fetch_interest_request::Arguments;
 use api::interest::interest::FollowedFeed;
 pub use api::interest::interest_api_client::InterestApiClient;
@@ -55,7 +58,7 @@ pub use api::interest::{FetchInterestRequest, FetchInterestResponse};
 use api::search::search_api_client::SearchApiClient;
 pub use api::search::search_request::payload::Filter;
 use api::search::search_request::Payload;
-pub use api::search::search_response::TwinDetails;
+pub use api::search::search_response::{FeedDetails, TwinDetails};
 pub use api::search::{ResponseType, SearchRequest, SearchResponse};
 use api::twin::create_twin_request::Payload as CreateTwinRequestPayload;
 use api::twin::delete_twin_request::Arguments as DeleteTwinRequestArguments;
@@ -77,6 +80,54 @@ pub struct TwinFeed {
     pub id: String,
     pub label: String,
     pub values: Vec<FeedValue>,
+}
+
+pub async fn create_search_api_client(
+    host_address: &str,
+) -> Result<SearchApiClient<Channel>, anyhow::Error> {
+    let endpoint = Channel::from_shared(host_address.to_string())?;
+    let tls = ClientTlsConfig::new();
+    let endpoint = endpoint.tls_config(tls)?;
+
+    let client = SearchApiClient::connect(endpoint).await?;
+
+    Ok(client)
+}
+
+pub async fn create_interest_api_client(
+    host_address: &str,
+) -> Result<InterestApiClient<Channel>, anyhow::Error> {
+    let endpoint = Channel::from_shared(host_address.to_string())?;
+    let tls = ClientTlsConfig::new();
+    let endpoint = endpoint.tls_config(tls)?;
+
+    let client = InterestApiClient::connect(endpoint).await?;
+
+    Ok(client)
+}
+
+pub async fn create_twin_api_client(
+    host_address: &str,
+) -> Result<TwinApiClient<Channel>, anyhow::Error> {
+    let endpoint = Channel::from_shared(host_address.to_string())?;
+    let tls = ClientTlsConfig::new();
+    let endpoint = endpoint.tls_config(tls)?;
+
+    let client = TwinApiClient::connect(endpoint).await?;
+
+    Ok(client)
+}
+
+pub async fn create_feed_api_client(
+    host_address: &str,
+) -> Result<FeedApiClient<Channel>, anyhow::Error> {
+    let endpoint = Channel::from_shared(host_address.to_string())?;
+    let tls = ClientTlsConfig::new();
+    let endpoint = endpoint.tls_config(tls)?;
+
+    let client = FeedApiClient::connect(endpoint).await?;
+
+    Ok(client)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -106,7 +157,7 @@ pub async fn share_data(
     feed_id: &str,
     data: Vec<u8>,
 ) -> Result<(), anyhow::Error> {
-    let mut client = FeedApiClient::connect(host_address.to_string()).await?;
+    let mut client = create_feed_api_client(host_address).await?;
 
     share_data_with_client(&mut client, token, twin_did, feed_id, data).await
 }
@@ -172,7 +223,7 @@ pub async fn create_update_feed(
     did: &str,
     feed: &TwinFeed,
 ) -> Result<(), anyhow::Error> {
-    let mut client = FeedApiClient::connect(host_address.to_string()).await?;
+    let mut client = create_feed_api_client(host_address).await?;
 
     let twin_id = TwinId {
         value: did.to_string(),
@@ -269,7 +320,7 @@ pub async fn create_update_twin(
     tags: Vec<String>,
     location: Option<GeoLocation>,
 ) -> Result<(), anyhow::Error> {
-    let mut client = TwinApiClient::connect(host_address.to_string()).await?;
+    let mut client = create_twin_api_client(host_address).await?;
 
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
@@ -350,7 +401,7 @@ pub async fn create_update_twin(
 }
 
 pub async fn delete_twin(host_address: &str, token: &str, did: &str) -> Result<(), anyhow::Error> {
-    let mut client = TwinApiClient::connect(host_address.to_string()).await?;
+    let mut client = create_twin_api_client(host_address).await?;
 
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
@@ -391,7 +442,7 @@ pub async fn search(
     scope: Scope,
     timeout: Option<Duration>,
 ) -> Result<Receiver<Result<SearchResponse, anyhow::Error>>, anyhow::Error> {
-    let client = SearchApiClient::connect(host_address.to_string()).await?;
+    let client = create_search_api_client(host_address).await?;
 
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
@@ -554,7 +605,7 @@ pub async fn follow(
     followed_feed: String,
     follower_twin_id: TwinId,
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
-    let mut client = InterestApiClient::connect(host_address.to_string()).await?;
+    let mut client = create_interest_api_client(host_address).await?;
 
     follow_with_client(
         &mut client,
@@ -616,7 +667,7 @@ pub async fn list_all_twins(
     host_address: &str,
     token: &str,
 ) -> Result<ListAllTwinsResponse, anyhow::Error> {
-    let mut client = TwinApiClient::connect(host_address.to_string()).await?;
+    let mut client = create_twin_api_client(host_address).await?;
 
     list_all_twins_with_client(&mut client, token).await
 }
@@ -683,6 +734,48 @@ pub async fn describe_twin_with_client(
     );
 
     let result = client.describe_twin(request).await?;
+
+    let result = result.into_inner();
+
+    Ok(result)
+}
+
+pub async fn describe_feed_with_client(
+    client: &mut FeedApiClient<Channel>,
+    token: &str,
+    twin_id: TwinId,
+    feed_id: FeedId,
+    remote_host_id: Option<HostId>,
+) -> Result<DescribeFeedResponse, anyhow::Error> {
+    let client_app_id = generate_client_app_id();
+    let transaction_ref = vec![client_app_id.clone()];
+
+    let headers = Headers {
+        client_app_id: client_app_id.clone(),
+        transaction_ref: transaction_ref.clone(),
+        ..Default::default()
+    };
+
+    let args = DescribeFeedRequestArguments {
+        feed: Some(Feed {
+            id: Some(feed_id),
+            twin_id: Some(twin_id),
+        }),
+        remote_host_id,
+    };
+
+    let mut request = tonic::Request::new(DescribeFeedRequest {
+        headers: Some(headers.clone()),
+        args: Some(args),
+        lang: None,
+    });
+
+    request.metadata_mut().append(
+        "authorization",
+        token.parse().context("parse token failed")?,
+    );
+
+    let result = client.describe_feed(request).await?;
 
     let result = result.into_inner();
 
