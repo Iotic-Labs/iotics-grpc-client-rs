@@ -18,7 +18,7 @@ mod api {
     }
 }
 
-const PAGE_SIZE: u32 = 100;
+pub const SEARCH_PAGE_SIZE: u32 = 100;
 
 use anyhow::Context;
 use prost_types::Timestamp;
@@ -487,7 +487,7 @@ pub async fn search(
 
                         while let Ok(Some(result)) = stream.message().await {
                             if let Some(payload) = &result.payload {
-                                if payload.twins.len() >= PAGE_SIZE as usize {
+                                if payload.twins.len() >= SEARCH_PAGE_SIZE as usize {
                                     let current_page = page.load(Ordering::SeqCst);
 
                                     if result.headers.as_ref().unwrap().client_ref
@@ -585,9 +585,11 @@ async fn search_page(
         payload: Some(payload),
         headers: Some(headers),
         range: Some(Range {
-            limit: Some(Limit { value: PAGE_SIZE }),
+            limit: Some(Limit {
+                value: SEARCH_PAGE_SIZE,
+            }),
             offset: Some(Offset {
-                value: PAGE_SIZE * page,
+                value: SEARCH_PAGE_SIZE * page,
             }),
         }),
     });
