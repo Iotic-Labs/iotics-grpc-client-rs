@@ -28,7 +28,6 @@ use std::time::Duration;
 use tokio::sync::mpsc::{channel, Receiver};
 use tonic::metadata::{Ascii, MetadataValue};
 pub use tonic::transport::Channel;
-use tonic::transport::ClientTlsConfig;
 pub use tonic::Streaming;
 
 pub use api::common::{
@@ -85,10 +84,7 @@ pub struct TwinFeed {
 pub async fn create_search_api_client(
     host_address: &str,
 ) -> Result<SearchApiClient<Channel>, anyhow::Error> {
-    let tls = ClientTlsConfig::new();
-    let endpoint = Channel::from_shared(host_address.to_string())?.tls_config(tls)?;
-
-    let client = SearchApiClient::connect(endpoint).await?;
+    let client = SearchApiClient::connect(host_address.to_string()).await?;
 
     Ok(client)
 }
@@ -96,10 +92,7 @@ pub async fn create_search_api_client(
 pub async fn create_interest_api_client(
     host_address: &str,
 ) -> Result<InterestApiClient<Channel>, anyhow::Error> {
-    let tls = ClientTlsConfig::new();
-    let endpoint = Channel::from_shared(host_address.to_string())?.tls_config(tls)?;
-
-    let client = InterestApiClient::connect(endpoint).await?;
+    let client = InterestApiClient::connect(host_address.to_string()).await?;
 
     Ok(client)
 }
@@ -107,26 +100,15 @@ pub async fn create_interest_api_client(
 pub async fn create_twin_api_client(
     host_address: &str,
 ) -> Result<TwinApiClient<Channel>, anyhow::Error> {
-    let tls = ClientTlsConfig::new();
-    let endpoint = Channel::from_shared(host_address.to_string())?.tls_config(tls)?;
-
-    let client = TwinApiClient::connect(endpoint).await?;
+    let client = TwinApiClient::connect(host_address.to_string()).await?;
 
     Ok(client)
 }
 
 pub async fn create_feed_api_client(
     host_address: &str,
-    concurrency_limit: Option<usize>,
 ) -> Result<FeedApiClient<Channel>, anyhow::Error> {
-    let tls = ClientTlsConfig::new();
-    let mut endpoint = Channel::from_shared(host_address.to_string())?.tls_config(tls)?;
-
-    if let Some(concurrency_limit) = concurrency_limit {
-        endpoint = endpoint.concurrency_limit(concurrency_limit);
-    }
-
-    let client = FeedApiClient::connect(endpoint).await?;
+    let client = FeedApiClient::connect(host_address.to_string()).await?;
 
     Ok(client)
 }
@@ -158,7 +140,7 @@ pub async fn share_data(
     feed_id: &str,
     data: Vec<u8>,
 ) -> Result<(), anyhow::Error> {
-    let mut client = create_feed_api_client(host_address, None).await?;
+    let mut client = create_feed_api_client(host_address).await?;
 
     share_data_with_client(&mut client, token, twin_did, feed_id, data).await
 }
@@ -224,7 +206,7 @@ pub async fn create_update_feed(
     did: &str,
     feed: &TwinFeed,
 ) -> Result<(), anyhow::Error> {
-    let mut client = create_feed_api_client(host_address, None).await?;
+    let mut client = create_feed_api_client(host_address).await?;
 
     let twin_id = TwinId {
         value: did.to_string(),
