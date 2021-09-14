@@ -28,6 +28,7 @@ use std::time::Duration;
 use tokio::sync::mpsc::{channel, Receiver};
 use tonic::metadata::{Ascii, MetadataValue};
 pub use tonic::transport::Channel;
+use tonic::Code;
 pub use tonic::Streaming;
 
 pub use api::common::{
@@ -139,10 +140,11 @@ pub async fn share_data(
     twin_did: &str,
     feed_id: &str,
     data: Vec<u8>,
+    retry_unknown: bool,
 ) -> Result<(), anyhow::Error> {
     let mut client = create_feed_api_client(host_address).await?;
 
-    share_data_with_client(&mut client, token, twin_did, feed_id, data).await
+    share_data_with_client(&mut client, token, twin_did, feed_id, data, retry_unknown).await
 }
 
 pub async fn share_data_with_client(
@@ -151,6 +153,7 @@ pub async fn share_data_with_client(
     twin_did: &str,
     feed_id: &str,
     data: Vec<u8>,
+    retry_unknown: bool,
 ) -> Result<(), anyhow::Error> {
     let twin_id = TwinId {
         value: twin_did.to_string(),
@@ -186,8 +189,8 @@ pub async fn share_data_with_client(
 
     let mut request = tonic::Request::new(ShareFeedDataRequest {
         headers: Some(headers.clone()),
-        args: Some(args),
-        payload: Some(payload),
+        args: Some(args.clone()),
+        payload: Some(payload.clone()),
     });
 
     request.metadata_mut().append(
@@ -195,7 +198,26 @@ pub async fn share_data_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    client.share_feed_data(request).await?;
+    let result = client.share_feed_data(request).await;
+
+    if let Err(e) = result {
+        if retry_unknown && e.code() == Code::Unknown {
+            let mut request = tonic::Request::new(ShareFeedDataRequest {
+                headers: Some(headers.clone()),
+                args: Some(args),
+                payload: Some(payload),
+            });
+
+            request.metadata_mut().append(
+                "authorization",
+                token.parse().context("parse token failed")?,
+            );
+
+            client.share_feed_data(request).await?;
+        } else {
+            return Err(e.into());
+        }
+    }
 
     Ok(())
 }
