@@ -1,5 +1,5 @@
 pub use tonic::transport::Channel;
-pub use tonic::Streaming;
+pub use tonic::{Response, Streaming};
 
 use crate::api;
 

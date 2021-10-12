@@ -1,6 +1,8 @@
+pub mod upsert;
+
+// TODO extract this into separate files
 use anyhow::Context;
 use prost_types::Timestamp;
-
 use tonic::transport::Channel;
 use tonic::Code;
 
@@ -82,6 +84,93 @@ pub async fn create_update_twin_with_feeds(
     for feed in feeds {
         create_update_feed(feed_client, token, did, &feed).await?;
     }
+
+    Ok(())
+}
+
+pub async fn create_update_twin(
+    client: &mut TwinApiClient<Channel>,
+    token: &str,
+    did: &str,
+    label: &str,
+    properties: Vec<Property>,
+    tags: Vec<String>,
+    location: Option<GeoLocation>,
+) -> Result<(), anyhow::Error> {
+    let client_app_id = generate_client_app_id();
+    let transaction_ref = vec![client_app_id.clone()];
+
+    let headers = Headers {
+        client_app_id: client_app_id.clone(),
+        transaction_ref: transaction_ref.clone(),
+        ..Default::default()
+    };
+
+    let twin_id = TwinId {
+        value: did.to_string(),
+    };
+
+    let payload = CreateTwinRequestPayload {
+        twin_id: Some(twin_id.clone()),
+    };
+
+    let mut request = tonic::Request::new(CreateTwinRequest {
+        headers: Some(headers.clone()),
+        payload: Some(payload),
+    });
+
+    request.metadata_mut().append(
+        "authorization",
+        token.parse().context("parse token failed")?,
+    );
+
+    client.create_twin(request).await?;
+
+    let args = UpdateTwinRequestArguments {
+        twin_id: Some(twin_id.clone()),
+    };
+
+    let mut payload = UpdateTwinRequestPayload {
+        labels: Some(LabelUpdate {
+            added: vec![LangLiteral {
+                lang: "en".to_string(),
+                value: label.to_string(),
+            }],
+            ..Default::default()
+        }),
+        new_visibility: Some(VisibilityUpdate {
+            visibility: Visibility::Public as i32,
+        }),
+        properties: Some(PropertyUpdate {
+            cleared_all: true,
+            added: properties,
+            ..Default::default()
+        }),
+        tags: Some(Tags {
+            added: tags,
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+
+    if let Some(location) = location {
+        payload.location = Some(GeoLocationUpdate {
+            location: Some(location),
+        });
+    }
+
+    let mut request = tonic::Request::new(UpdateTwinRequest {
+        headers: Some(headers),
+        args: Some(args),
+        payload: Some(payload),
+    });
+
+    request.metadata_mut().append(
+        "authorization",
+        token.parse().context("parse token failed")?,
+    );
+
+    client.update_twin(request).await?;
 
     Ok(())
 }
@@ -174,93 +263,6 @@ pub async fn create_update_feed(
         .update_feed(request)
         .await
         .context("update feed failed")?;
-
-    Ok(())
-}
-
-pub async fn create_update_twin(
-    client: &mut TwinApiClient<Channel>,
-    token: &str,
-    did: &str,
-    label: &str,
-    properties: Vec<Property>,
-    tags: Vec<String>,
-    location: Option<GeoLocation>,
-) -> Result<(), anyhow::Error> {
-    let client_app_id = generate_client_app_id();
-    let transaction_ref = vec![client_app_id.clone()];
-
-    let headers = Headers {
-        client_app_id: client_app_id.clone(),
-        transaction_ref: transaction_ref.clone(),
-        ..Default::default()
-    };
-
-    let twin_id = TwinId {
-        value: did.to_string(),
-    };
-
-    let payload = CreateTwinRequestPayload {
-        twin_id: Some(twin_id.clone()),
-    };
-
-    let mut request = tonic::Request::new(CreateTwinRequest {
-        headers: Some(headers.clone()),
-        payload: Some(payload),
-    });
-
-    request.metadata_mut().append(
-        "authorization",
-        token.parse().context("parse token failed")?,
-    );
-
-    client.create_twin(request).await?;
-
-    let args = UpdateTwinRequestArguments {
-        twin_id: Some(twin_id.clone()),
-    };
-
-    let mut payload = UpdateTwinRequestPayload {
-        labels: Some(LabelUpdate {
-            added: vec![LangLiteral {
-                lang: "en".to_string(),
-                value: label.to_string(),
-            }],
-            ..Default::default()
-        }),
-        new_visibility: Some(VisibilityUpdate {
-            visibility: Visibility::Public as i32,
-        }),
-        properties: Some(PropertyUpdate {
-            cleared_all: true,
-            added: properties,
-            ..Default::default()
-        }),
-        tags: Some(Tags {
-            added: tags,
-            ..Default::default()
-        }),
-        ..Default::default()
-    };
-
-    if let Some(location) = location {
-        payload.location = Some(GeoLocationUpdate {
-            location: Some(location),
-        });
-    }
-
-    let mut request = tonic::Request::new(UpdateTwinRequest {
-        headers: Some(headers),
-        args: Some(args),
-        payload: Some(payload),
-    });
-
-    request.metadata_mut().append(
-        "authorization",
-        token.parse().context("parse token failed")?,
-    );
-
-    client.update_twin(request).await?;
 
     Ok(())
 }
