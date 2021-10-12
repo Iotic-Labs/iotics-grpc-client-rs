@@ -246,3 +246,21 @@ message DescribeFeedResponse {
     }
     Payload payload = 2;
 }
+
+// UpsertFeedWithMeta is used to describe the full feed state. Used in UpsertTwinRequest.
+message UpsertFeedWithMeta {
+    // Id of the feed to create/update
+    string id = 1;
+
+    // Labels are human-readable set of labels (language-specific) to set
+    repeated common.LangLiteral labels = 2;
+
+    // Comments are human-readable set of labels (language-specific) to set
+    repeated common.LangLiteral comments = 3;
+
+    // storeLast dictates whether to store the last shared sample of the feed. Default 'False'
+    bool storeLast = 4;
+
+    // values to set
+    repeated common.Value values = 5;
+}
