@@ -6,6 +6,7 @@
 syntax = "proto3";
 
 import "common/model.proto";
+import "feed/model.proto";
 import "google/protobuf/wrappers.proto";
 
 package twin;
@@ -268,5 +269,55 @@ message UpdateTwinResponse {
   // UpdateTwinResponse headers
   common.Headers headers = 1;
   //UpdateTwinResponse payload
+  Payload payload = 2;
+}
+
+// UpsertTwinRequest describes the full state of a twin + its feeds to create or update (full update)
+message UpsertTwinRequest {
+
+  // UpsertTwinRequest payload. This state will be applied to the twin/feeds
+  message Payload {
+
+    // Unique ID of the twin to create/update
+    string twinId = 1;
+
+    // Twin visibility. Default value: 'PRIVATE'
+    common.Visibility visibility = 2;
+
+    // Labels are human-readable set of labels (language-specific) to set
+    repeated common.LangLiteral labels = 3;
+
+    // Comments are human-readable set of labels (language-specific) to set
+    repeated common.LangLiteral comments = 4;
+
+    // Twin Properties to set
+    repeated common.Property properties = 5;
+
+    // Twin location to set. If not set the Twin will have no location
+    common.GeoLocation location = 6;
+
+    // Feeds with metadata to set to the twin
+    repeated feed.UpsertFeedWithMeta feeds = 7;
+
+  }
+  // UpdateTwinRequest headers
+  common.Headers headers = 1;
+
+  // UpdateTwinRequest payload
+  Payload payload = 2;
+}
+// UpsertTwinResponse is received when a twin and its feeds have been created/updated.
+message UpsertTwinResponse {
+
+  // Payload identifies the twin which was created.
+  message Payload {
+    // created/updated twin
+    string twinId = 1;
+  }
+
+  // Common headers
+  common.Headers headers = 1;
+
+  // Request-specific payload
   Payload payload = 2;
 }

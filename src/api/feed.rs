@@ -321,6 +321,25 @@ pub mod describe_feed_response {
         pub remote_host_id: ::core::option::Option<super::super::common::HostId>,
     }
 }
+/// UpsertFeedWithMeta is used to describe the full feed state. Used in UpsertTwinRequest.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpsertFeedWithMeta {
+    /// Id of the feed to create/update
+    #[prost(string, tag = "1")]
+    pub id: ::prost::alloc::string::String,
+    /// Labels are human-readable set of labels (language-specific) to set
+    #[prost(message, repeated, tag = "2")]
+    pub labels: ::prost::alloc::vec::Vec<super::common::LangLiteral>,
+    /// Comments are human-readable set of labels (language-specific) to set
+    #[prost(message, repeated, tag = "3")]
+    pub comments: ::prost::alloc::vec::Vec<super::common::LangLiteral>,
+    /// storeLast dictates whether to store the last shared sample of the feed. Default 'False'
+    #[prost(bool, tag = "4")]
+    pub store_last: bool,
+    /// values to set
+    #[prost(message, repeated, tag = "5")]
+    pub values: ::prost::alloc::vec::Vec<super::common::Value>,
+}
 #[doc = r" Generated client implementations."]
 pub mod feed_api_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]

@@ -324,6 +324,64 @@ pub mod update_twin_response {
         pub twin: ::core::option::Option<super::Twin>,
     }
 }
+/// UpsertTwinRequest describes the full state of a twin + its feeds to create or update (full update)
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpsertTwinRequest {
+    /// UpdateTwinRequest headers
+    #[prost(message, optional, tag = "1")]
+    pub headers: ::core::option::Option<super::common::Headers>,
+    /// UpdateTwinRequest payload
+    #[prost(message, optional, tag = "2")]
+    pub payload: ::core::option::Option<upsert_twin_request::Payload>,
+}
+/// Nested message and enum types in `UpsertTwinRequest`.
+pub mod upsert_twin_request {
+    /// UpsertTwinRequest payload. This state will be applied to the twin/feeds
+    #[derive(Clone, PartialEq, ::prost::Message)]
+    pub struct Payload {
+        /// Unique ID of the twin to create/update
+        #[prost(string, tag = "1")]
+        pub twin_id: ::prost::alloc::string::String,
+        /// Twin visibility. Default value: 'PRIVATE'
+        #[prost(enumeration = "super::super::common::Visibility", tag = "2")]
+        pub visibility: i32,
+        /// Labels are human-readable set of labels (language-specific) to set
+        #[prost(message, repeated, tag = "3")]
+        pub labels: ::prost::alloc::vec::Vec<super::super::common::LangLiteral>,
+        /// Comments are human-readable set of labels (language-specific) to set
+        #[prost(message, repeated, tag = "4")]
+        pub comments: ::prost::alloc::vec::Vec<super::super::common::LangLiteral>,
+        /// Twin Properties to set
+        #[prost(message, repeated, tag = "5")]
+        pub properties: ::prost::alloc::vec::Vec<super::super::common::Property>,
+        /// Twin location to set. If not set the Twin will have no location
+        #[prost(message, optional, tag = "6")]
+        pub location: ::core::option::Option<super::super::common::GeoLocation>,
+        /// Feeds with metadata to set to the twin
+        #[prost(message, repeated, tag = "7")]
+        pub feeds: ::prost::alloc::vec::Vec<super::super::feed::UpsertFeedWithMeta>,
+    }
+}
+/// UpsertTwinResponse is received when a twin and its feeds have been created/updated.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpsertTwinResponse {
+    /// Common headers
+    #[prost(message, optional, tag = "1")]
+    pub headers: ::core::option::Option<super::common::Headers>,
+    /// Request-specific payload
+    #[prost(message, optional, tag = "2")]
+    pub payload: ::core::option::Option<upsert_twin_response::Payload>,
+}
+/// Nested message and enum types in `UpsertTwinResponse`.
+pub mod upsert_twin_response {
+    /// Payload identifies the twin which was created.
+    #[derive(Clone, PartialEq, ::prost::Message)]
+    pub struct Payload {
+        /// created/updated twin
+        #[prost(string, tag = "1")]
+        pub twin_id: ::prost::alloc::string::String,
+    }
+}
 #[doc = r" Generated client implementations."]
 pub mod twin_api_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -398,6 +456,23 @@ pub mod twin_api_client {
             })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/twin.TwinAPI/CreateTwin");
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " UpsertTwin creates or update a twin with its metadata + the twin feeds with their metadata."]
+        #[doc = " The full state is applied (ie. if the operation succeeds the state of the twin/feeds will be the one"]
+        #[doc = " described in the payload)"]
+        pub async fn upsert_twin(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpsertTwinRequest>,
+        ) -> Result<tonic::Response<super::UpsertTwinResponse>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static("/twin.TwinAPI/UpsertTwin");
             self.inner.unary(request.into_request(), path, codec).await
         }
         #[doc = " DeleteTwin deletes a twin."]
