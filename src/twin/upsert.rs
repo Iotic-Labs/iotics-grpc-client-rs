@@ -20,6 +20,7 @@ pub async fn upsert_twin(
     properties: Vec<Property>,
     feeds: Vec<UpsertFeedWithMeta>,
     location: Option<GeoLocation>,
+    visibility: i32,
 ) -> Result<Response<UpsertTwinResponse>, anyhow::Error> {
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
@@ -36,6 +37,7 @@ pub async fn upsert_twin(
         properties,
         feeds,
         location,
+        visibility,
         ..Default::default()
     };
 
