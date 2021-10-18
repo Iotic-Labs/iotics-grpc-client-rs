@@ -36,7 +36,7 @@ pub mod search_request {
     pub mod payload {
         /// Search request filters, any of these can be used in combination or on their own.
         #[derive(serde::Serialize, serde::Deserialize)]
-        #[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
+        #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct Filter {
             /// Text filtering. One or more keywords which must match either text from twin/feed labels/comments (in the given

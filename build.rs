@@ -5,39 +5,39 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .format(true)
         .type_attribute(
             ".common.Uri",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
         )
         .type_attribute(
             ".common.StringLiteral",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
         )
         .type_attribute(
             ".common.LangLiteral",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
         )
         .type_attribute(
             ".common.Literal",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
         )
         .type_attribute(
             ".common.Property.Value",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
         )
         .type_attribute(
             ".common.Property",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
         )
         .type_attribute(
             ".common.GeoLocation",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
         )
         .type_attribute(
             ".common.GeoCircle",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
         )
         .type_attribute(
             ".search.SearchRequest.Payload.Filter",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"snake_case\", deserialize = \"snake_case\"))]",
+            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
         )
         .compile(
             &[

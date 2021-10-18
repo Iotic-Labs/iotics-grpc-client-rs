@@ -29,7 +29,7 @@ pub struct Range {
 }
 /// LangLiteral is a metadata property type describing a string with a given language (implicit datatype: rdf:langString).
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LangLiteral {
     /// 2-character language code
@@ -41,7 +41,7 @@ pub struct LangLiteral {
 }
 /// StringLiteral is a metadata property type describing a string without a language (implicit datatype: rdf:string).
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct StringLiteral {
     /// String representation of the value
@@ -50,7 +50,7 @@ pub struct StringLiteral {
 }
 /// Literal is a metadata property type describing a literal with the given datatype (implicit datatype: rdfs:Literal).
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Literal {
     /// XSD data type (e.g. double) without its namespace prefix (http://www.w3.org/2001/XMLSchema#). The following types
@@ -66,7 +66,7 @@ pub struct Literal {
 }
 /// Uri is a metadata property type describing am Uri.
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Uri {
     /// String representation of the value
@@ -76,7 +76,7 @@ pub struct Uri {
 /// Property is a metadata property with a single value.
 /// Multiple instances are used to represent a key (predicate) with multiple values.
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Property {
     /// The key (predicate) of the property
@@ -90,7 +90,7 @@ pub struct Property {
 pub mod property {
     /// The value of the property. Only one of these fields can be set
     #[derive(serde::Serialize, serde::Deserialize)]
-    #[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
+    #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Value {
         #[prost(message, tag = "2")]
@@ -105,7 +105,7 @@ pub mod property {
 }
 /// GeoLocation is the geographic location of a Twin.
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GeoLocation {
     /// Latitude
@@ -117,7 +117,7 @@ pub struct GeoLocation {
 }
 /// GeoCircle is an approximate geographic location.
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GeoCircle {
     #[prost(message, optional, tag = "1")]
