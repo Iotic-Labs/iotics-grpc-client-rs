@@ -12,6 +12,7 @@ use crate::helpers::generate_client_app_id;
 pub use crate::api::feed::UpsertFeedWithMeta;
 pub use crate::api::twin::UpsertTwinResponse;
 
+#[allow(clippy::too_many_arguments)]
 pub async fn upsert_twin(
     client: &mut TwinApiClient<Channel>,
     token: &str,
