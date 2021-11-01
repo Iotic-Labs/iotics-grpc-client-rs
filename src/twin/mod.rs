@@ -175,6 +175,55 @@ pub async fn create_update_twin(
     Ok(())
 }
 
+pub async fn update_twin(
+    client: &mut TwinApiClient<Channel>,
+    token: &str,
+    did: &str,
+    properties: Vec<Property>,
+    cleared_all: bool,
+) -> Result<(), anyhow::Error> {
+    let client_app_id = generate_client_app_id();
+    let transaction_ref = vec![client_app_id.clone()];
+
+    let headers = Headers {
+        client_app_id: client_app_id.clone(),
+        transaction_ref: transaction_ref.clone(),
+        ..Default::default()
+    };
+
+    let twin_id = TwinId {
+        value: did.to_string(),
+    };
+
+    let args = UpdateTwinRequestArguments {
+        twin_id: Some(twin_id.clone()),
+    };
+
+    let payload = UpdateTwinRequestPayload {
+        properties: Some(PropertyUpdate {
+            cleared_all,
+            added: properties,
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+
+    let mut request = tonic::Request::new(UpdateTwinRequest {
+        headers: Some(headers),
+        args: Some(args),
+        payload: Some(payload),
+    });
+
+    request.metadata_mut().append(
+        "authorization",
+        token.parse().context("parse token failed")?,
+    );
+
+    client.update_twin(request).await?;
+
+    Ok(())
+}
+
 pub async fn create_update_feed(
     client: &mut FeedApiClient<Channel>,
     token: &str,
