@@ -175,7 +175,7 @@ pub async fn create_update_twin(
     Ok(())
 }
 
-pub async fn update_twin_properties(
+pub async fn update_twin(
     client: &mut TwinApiClient<Channel>,
     token: &str,
     did: &str,
