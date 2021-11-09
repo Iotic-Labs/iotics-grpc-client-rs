@@ -206,6 +206,8 @@ pub struct HostId {
     pub value: ::prost::alloc::string::String,
 }
 /// TwinID is a unique twin identifier.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TwinId {
     /// Twin Identifier (using DID format)
@@ -213,6 +215,8 @@ pub struct TwinId {
     pub value: ::prost::alloc::string::String,
 }
 /// FeedID is a unique feed identifier (scoped to the TwinID).
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FeedId {
     /// Feed Identifier string representation (simple string)
@@ -222,6 +226,8 @@ pub struct FeedId {
 /// Value is the definition of an individual piece of data within a Feed share. Values are purely descriptive, e.g. a
 /// Feed follower should expect data to match the values associated with said Feed but must be able to recover where this
 /// is not the case.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Value {
     /// label is the unique identifier of the value. It is language-neutral. E.g.: "t" / "temp" / "temperature".

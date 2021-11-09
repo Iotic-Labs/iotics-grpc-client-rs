@@ -69,6 +69,8 @@ pub struct SearchResponse {
 /// Nested message and enum types in `SearchResponse`.
 pub mod search_response {
     /// Search response feed details. Included with response type: FULL.
+    #[derive(serde::Serialize, serde::Deserialize)]
+    #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct FeedDetails {
         /// Feed
@@ -82,6 +84,8 @@ pub mod search_response {
         pub store_last: bool,
     }
     /// Search response twin details.
+    #[derive(serde::Serialize, serde::Deserialize)]
+    #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct TwinDetails {
         /// Twin identifier. Included with response type: FULL, LOCATED and MINIMAL
