@@ -53,7 +53,7 @@ pub struct StringLiteral {
 #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Literal {
-    /// XSD data type (e.g. double) without its namespace prefix (http://www.w3.org/2001/XMLSchema#). The following types
+    /// XSD data type (e.g. double) without its namespace prefix (<http://www.w3.org/2001/XMLSchema#>). The following types
     /// are currently supported:
     /// dateTime, time, date, boolean, integer, decimal, float, double, nonPositiveInteger, negativeInteger,
     /// nonNegativeInteger, positiveInteger, long, unsignedLong, int, unsignedInt, short, unsignedShort, byte,
@@ -230,7 +230,7 @@ pub struct Value {
     /// comment is the (optional) human-readable description of the value. It is language-specific. E.g.: "Engine oil temperature"
     #[prost(string, tag = "2")]
     pub comment: ::prost::alloc::string::String,
-    /// unit is the (optional) fully qualified ontology string URI of the unit, e.g. http://purl.obolibrary.org/obo/UO_0000027
+    /// unit is the (optional) fully qualified ontology string URI of the unit, e.g. <http://purl.obolibrary.org/obo/UO_0000027>
     #[prost(string, tag = "3")]
     pub unit: ::prost::alloc::string::String,
     /// dataType is the xsd type in shorthand notation.
