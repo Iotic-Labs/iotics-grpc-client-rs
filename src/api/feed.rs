@@ -1,4 +1,6 @@
 /// A feed representation.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Feed {
     /// feed identifier (unique within the scope of a twin identifier)
@@ -322,6 +324,8 @@ pub mod describe_feed_response {
     }
 }
 /// UpsertFeedWithMeta is used to describe the full feed state. Used in UpsertTwinRequest.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpsertFeedWithMeta {
     /// Id of the feed to create/update

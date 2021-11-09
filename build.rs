@@ -1,54 +1,43 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    tonic_build::configure()
+    let types_to_derive = vec![
+        ".common.Uri",
+        ".common.StringLiteral",
+        ".common.LangLiteral",
+        ".common.Literal",
+        ".common.Property.Value",
+        ".common.Property",
+        ".common.GeoLocation",
+        ".common.GeoCircle",
+        ".common.Value",
+        ".common.TwinID",
+        ".common.FeedID",
+        ".feed.Feed",
+        ".feed.UpsertFeedWithMeta",
+        ".search.SearchRequest.Payload.Filter",
+        ".search.SearchResponse.FeedDetails",
+        ".search.SearchResponse.TwinDetails",
+    ];
+    let derive_ser_der = "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]";
+
+    let mut builder = tonic_build::configure()
         .out_dir("src/api")
         .build_server(false)
-        .format(true)
-        .type_attribute(
-            ".common.Uri",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
-        )
-        .type_attribute(
-            ".common.StringLiteral",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
-        )
-        .type_attribute(
-            ".common.LangLiteral",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
-        )
-        .type_attribute(
-            ".common.Literal",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
-        )
-        .type_attribute(
-            ".common.Property.Value",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
-        )
-        .type_attribute(
-            ".common.Property",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
-        )
-        .type_attribute(
-            ".common.GeoLocation",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
-        )
-        .type_attribute(
-            ".common.GeoCircle",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
-        )
-        .type_attribute(
-            ".search.SearchRequest.Payload.Filter",
-            "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]",
-        )
-        .compile(
-            &[
-                "proto/common/service.proto",
-                "proto/search/service.proto",
-                "proto/twin/service.proto",
-                "proto/feed/service.proto",
-                "proto/interest/service.proto",
-            ],
-            &["proto"],
-        )?;
+        .format(true);
+
+    for type_to_derive in types_to_derive {
+        builder = builder.type_attribute(type_to_derive, derive_ser_der);
+    }
+
+    builder.compile(
+        &[
+            "proto/common/service.proto",
+            "proto/search/service.proto",
+            "proto/twin/service.proto",
+            "proto/feed/service.proto",
+            "proto/interest/service.proto",
+        ],
+        &["proto"],
+    )?;
 
     Ok(())
 }
