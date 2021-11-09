@@ -219,7 +219,7 @@ pub struct ListAllFeedsRequest {
     #[prost(message, optional, tag = "2")]
     pub args: ::core::option::Option<list_all_feeds_request::Arguments>,
     /// Limit the results according to the value
-    /// (optional: when not supplied, assume no default limits required - See https://ioticlabs.atlassian.net/browse/FO-1362)
+    /// (optional: when not supplied, assume no default limits required - See <https://ioticlabs.atlassian.net/browse/FO-1362>)
     #[prost(message, optional, tag = "3")]
     pub range: ::core::option::Option<super::common::Range>,
 }
@@ -365,7 +365,7 @@ pub mod feed_api_client {
     impl<T> FeedApiClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
-        T::ResponseBody: Body + Send + Sync + 'static,
+        T::ResponseBody: Body + Send + 'static,
         T::Error: Into<StdError>,
         <T::ResponseBody as Body>::Error: Into<StdError> + Send,
     {
