@@ -1,0 +1,30 @@
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+
+[tasks.format]
+command = "cargo"
+args = ["fmt", "--verbose", "--", "--check"]
+
+[tasks.check]
+command = "cargo"
+args = ["check", "--verbose"]
+
+[tasks.clippy]
+command = "cargo"
+args = ["clippy", "--all-targets", "--all-features", "--verbose", "--", "-D", "warnings"]
+
+[tasks.test]
+command = "cargo"
+args = ["test", "--verbose"]
+
+[tasks.audit]
+command = "cargo"
+args = ["audit"]
+
+[tasks.ci-flow]
+dependencies = [
+    "format",
+    "check",
+    "clippy",
+    "test"
+]
