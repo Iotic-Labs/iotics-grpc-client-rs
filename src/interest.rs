@@ -27,6 +27,7 @@ pub async fn follow(
     followed_twin_id: TwinId,
     followed_feed: String,
     follower_twin_id: TwinId,
+    fetch_last_stored: bool,
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
     let mut client = create_interest_api_client(host_address).await?;
 
@@ -37,6 +38,7 @@ pub async fn follow(
         followed_twin_id,
         followed_feed,
         follower_twin_id,
+        fetch_last_stored,
     )
     .await
 }
@@ -48,6 +50,7 @@ pub async fn follow_with_client(
     followed_twin_id: TwinId,
     followed_feed: String,
     follower_twin_id: TwinId,
+    fetch_last_stored: bool,
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
     let client_app_id = generate_client_app_id();
 
@@ -73,7 +76,7 @@ pub async fn follow_with_client(
                 follower_twin_id: Some(follower_twin_id),
             }),
         }),
-        ..Default::default()
+        fetch_last_stored: Some(fetch_last_stored),
     });
 
     request.metadata_mut().append(
