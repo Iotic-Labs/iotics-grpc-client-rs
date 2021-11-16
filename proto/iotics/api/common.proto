@@ -9,9 +9,33 @@ syntax = "proto3";
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 
-package common;
+package iotics.api;
 
-option go_package = "github.com/Iotic-Labs/iotic-go-proto-qapi/common";
+// The csharp_namespace should be the package name with each package sub-name capitalized.
+option csharp_namespace = "Iotics.Api";
+// The go_package should be the last non-version package sub-name concatenated with the
+// package version.
+//
+// Of special note: For the V1 Style Guide, this was the last package sub-name concatenated
+// with "pb", so for a package "uber.trip", it would be "trippb", but since the V2 Style Guide
+// requires package versions, we have changed "pb" to be the package version.
+option go_package = "github.com/Iotic-Labs/iotic-go-proto-qapi/iotics/api;ioticsapi";
+// The java_multiple_files option should always be true.
+option java_multiple_files = true;
+// The java_outer_classname should be the PascalCased file name, removing the "." for the
+// extension.
+option java_outer_classname = "CommonProto";
+// The java_package should be "com." plus the package name.
+option java_package = "com.iotics.api";
+// The objc_class_prefix should be the uppercase first letter of each package sub-name,
+// not including the package-version, with the following rules:
+//   - If the resulting abbreviation is 2 characters, add "X".
+//   - If the resulting abbreviation is 1 character, add "XX".
+//   - If the resulting abbreviation is "GBP", change it to "GPX". "GBP" is reserved
+//     by Google for the Protocol Buffers implementation.
+option objc_class_prefix = "IAX";
+// The php_namespace is the same as the csharp_namespace, with "\\" substituted for ".".
+option php_namespace = "Iotics\\Api";
 
 // ---------------------------------------------------------------------------------------------------------------------
 

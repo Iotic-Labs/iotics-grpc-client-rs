@@ -6,14 +6,14 @@ use tokio::sync::mpsc::{channel, Receiver};
 use tonic::metadata::{Ascii, MetadataValue};
 use tonic::transport::Channel;
 
-pub use crate::api::search::search_api_client::SearchApiClient;
-pub use crate::api::search::search_request::payload::Filter;
-pub use crate::api::search::search_response::{FeedDetails, TwinDetails};
-pub use crate::api::search::{ResponseType, SearchRequest, SearchResponse};
+pub use crate::client::iotics::api::search_api_client::SearchApiClient;
+pub use crate::client::iotics::api::search_request::payload::Filter;
+pub use crate::client::iotics::api::search_response::{FeedDetails, TwinDetails};
+pub use crate::client::iotics::api::{ResponseType, SearchRequest, SearchResponse};
 pub const SEARCH_PAGE_SIZE: u32 = 100;
 
-use crate::api::common::{Headers, Limit, Offset, Range, Scope, SubscriptionHeaders};
-use crate::api::search::search_request::Payload;
+use crate::client::iotics::api::search_request::Payload;
+use crate::client::iotics::api::{Headers, Limit, Offset, Range, Scope, SubscriptionHeaders};
 use crate::helpers::generate_client_app_id;
 
 pub async fn create_search_api_client(

@@ -2,14 +2,14 @@ use anyhow::Context;
 use tonic::transport::Channel;
 use tonic::Streaming;
 
-pub use crate::api::interest::interest_api_client::InterestApiClient;
-pub use crate::api::interest::{FetchInterestRequest, FetchInterestResponse};
+pub use crate::client::iotics::api::interest_api_client::InterestApiClient;
+pub use crate::client::iotics::api::{FetchInterestRequest, FetchInterestResponse};
 
-use crate::api::common::{FeedId, Headers, HostId, TwinId};
-use crate::api::feed::Feed;
-use crate::api::interest::fetch_interest_request::Arguments;
-use crate::api::interest::interest::FollowedFeed;
-use crate::api::interest::Interest;
+use crate::client::iotics::api::fetch_interest_request::Arguments;
+use crate::client::iotics::api::interest::FollowedFeed;
+use crate::client::iotics::api::Feed;
+use crate::client::iotics::api::Interest;
+use crate::client::iotics::api::{FeedId, Headers, HostId, TwinId};
 use crate::helpers::generate_client_app_id;
 
 pub async fn create_interest_api_client(

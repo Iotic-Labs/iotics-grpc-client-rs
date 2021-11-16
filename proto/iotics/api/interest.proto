@@ -5,13 +5,55 @@
 
 syntax = "proto3";
 
-import "common/model.proto";
-import "feed/model.proto";
 import "google/protobuf/wrappers.proto";
+import "iotics/api/common.proto";
+import "iotics/api/feed.proto";
 
-package interest;
+package iotics.api;
 
-option go_package = "github.com/Iotic-Labs/iotic-go-proto-qapi/interest";
+// The csharp_namespace should be the package name with each package sub-name capitalized.
+option csharp_namespace = "Iotics.Api";
+// The go_package should be the last non-version package sub-name concatenated with the
+// package version.
+//
+// Of special note: For the V1 Style Guide, this was the last package sub-name concatenated
+// with "pb", so for a package "uber.trip", it would be "trippb", but since the V2 Style Guide
+// requires package versions, we have changed "pb" to be the package version.
+option go_package = "github.com/Iotic-Labs/iotic-go-proto-qapi/iotics/api;ioticsapi";
+// The java_multiple_files option should always be true.
+option java_multiple_files = true;
+// The java_outer_classname should be the PascalCased file name, removing the "." for the
+// extension.
+option java_outer_classname = "InterestProto";
+// The java_package should be "com." plus the package name.
+option java_package = "com.iotics.api";
+// The objc_class_prefix should be the uppercase first letter of each package sub-name,
+// not including the package-version, with the following rules:
+//   - If the resulting abbreviation is 2 characters, add "X".
+//   - If the resulting abbreviation is 1 character, add "XX".
+//   - If the resulting abbreviation is "GBP", change it to "GPX". "GBP" is reserved
+//     by Google for the Protocol Buffers implementation.
+option objc_class_prefix = "IAX";
+// The php_namespace is the same as the csharp_namespace, with "\\" substituted for ".".
+option php_namespace = "Iotics\\Api";
+// InterestAPI enables creation and management of interests between a twin and a feed.
+service InterestAPI {
+  // Fetch feed data for this interest.
+  rpc FetchInterests(FetchInterestRequest) returns (stream FetchInterestResponse) {}
+
+  // Fetch last data shared on this interest.
+  rpc FetchLastStored(FetchLastStoredRequest) returns (FetchInterestResponse) {}
+
+  // List all interests associated to a given follower twin (Not implemented yet).
+  rpc ListAllInterests(ListAllInterestsRequest) returns (ListAllInterestsResponse) {}
+
+  // Create an interest between a follower twin and a followed feed.
+  rpc CreateInterest(CreateInterestRequest) returns (CreateInterestResponse) {}
+
+  // Delete an existing interest.
+  rpc DeleteInterest(DeleteInterestRequest) returns (DeleteInterestResponse) {}
+
+}
 
 // An interest is the relationship between a Twin and a Feed. For example, creating
 // an interest on (following) a Feed results in any data shared on said Feed to be forwarded to
@@ -21,13 +63,13 @@ message Interest {
   // FollowedFeed fully identify the (local or remote) feed to follow.
   message FollowedFeed {
     // Followed feed identifier
-    feed.Feed feed = 1;
+    Feed feed = 1;
     // Feed remote host identifier (If not specified, the Interest is taken to be in scope of the host from which a request is made.)
-    common.HostID hostId = 2;
+    HostID hostId = 2;
   }
 
   // Follower twin unique identifier.
-  common.TwinID followerTwinId = 2;
+  TwinID followerTwinId = 2;
 
   // a reference to the interested feed
   FollowedFeed followedFeed = 3;
@@ -43,11 +85,11 @@ message CreateInterestRequest {
   // CreateInterestRequest mandatory arguments.
   message Arguments {
     // Follower twin unique identifier
-    common.TwinID twinId = 1;
+    TwinID twinId = 1;
   }
 
   // CreateInterestRequest headers
-  common.Headers headers = 1;
+  Headers headers = 1;
   // CreateInterestRequest arguments
   Arguments args = 2;
   // CreateInterestRequest payload
@@ -65,7 +107,7 @@ message CreateInterestResponse {
     bool alreadyCreated = 3;
   }
   // CreateInterestResponse headers
-  common.Headers headers = 1;
+  Headers headers = 1;
   // CreateInterestResponse payload
   Payload payload = 2;
 }
@@ -77,15 +119,15 @@ message ListAllInterestsRequest {
   // ListAllInterestsRequest mandatory arguments.
   message Arguments {
     // Follower twin unique identifier
-    common.TwinID twinId = 1;
+    TwinID twinId = 1;
   }
 
   // ListAllInterestsRequest headers
-  common.Headers headers = 1;
+  Headers headers = 1;
   // ListAllInterestsRequest arguments
   Arguments args = 2;
   // Limit the results according to the value (optional: when not supplied, assume no default limits required - platform specific)
-  common.Range range = 20;
+  Range range = 20;
 }
 
 
@@ -96,7 +138,7 @@ message ListAllInterestsResponse {
     repeated Interest interests = 1;
   }
   // ListAllInterestsResponse headers
-  common.Headers headers = 1;
+  Headers headers = 1;
   // ListAllInterestsResponse payload.
   Payload payload = 2;
 }
@@ -111,7 +153,7 @@ message FetchInterestRequest {
     Interest interest = 1;
   }
   // FetchInterestRequest headers
-  common.Headers headers = 1;
+  Headers headers = 1;
   // FetchInterestRequest arguments
   Arguments args = 2;
   // whether to fetch the last stored value if available (false by default)
@@ -125,10 +167,10 @@ message FetchInterestResponse {
     // The interest
     Interest interest = 1;
     // The shared data
-    common.FeedData feedData = 2;
+    FeedData feedData = 2;
   }
   // FetchInterestResponse headers
-  common.Headers headers = 1;
+  Headers headers = 1;
   // FetchInterestResponse payload
   Payload payload = 2;
 }
@@ -143,7 +185,7 @@ message FetchLastStoredRequest {
     Interest interest = 1;
   }
   // FetchLastStoredRequest headers
-  common.Headers headers = 1;
+  Headers headers = 1;
   // FetchLastStoredRequest arguments
   Arguments args = 2;
 }
@@ -158,7 +200,7 @@ message DeleteInterestRequest {
     Interest interest = 1;
   }
   // DeleteInterestRequest headers
-  common.Headers headers = 1;
+  Headers headers = 1;
   // DeleteInterestRequest args
   Arguments args = 2;
 }
@@ -171,7 +213,7 @@ message DeleteInterestResponse {
     Interest interest = 1;
   }
   // DeleteInterestResponse headers
-  common.Headers headers = 1;
+  Headers headers = 1;
   // DeleteInterestResponse payload
   Payload payload = 2;
 }
