@@ -2,15 +2,15 @@ use anyhow::Context;
 use tonic::transport::Channel;
 use tonic::{Request, Response};
 
-use crate::api::common::{GeoLocation, Headers, LangLiteral, Property};
-use crate::api::twin::twin_api_client::TwinApiClient;
-use crate::api::twin::upsert_twin_request::Payload as UpsertTwinRequestPayload;
-use crate::api::twin::UpsertTwinRequest;
+use crate::client::iotics::api::twin_api_client::TwinApiClient;
+use crate::client::iotics::api::upsert_twin_request::Payload as UpsertTwinRequestPayload;
+use crate::client::iotics::api::UpsertTwinRequest;
+use crate::client::iotics::api::{GeoLocation, Headers, LangLiteral, Property};
 
 use crate::helpers::generate_client_app_id;
 
-pub use crate::api::feed::UpsertFeedWithMeta;
-pub use crate::api::twin::UpsertTwinResponse;
+pub use crate::client::iotics::api::UpsertFeedWithMeta;
+pub use crate::client::iotics::api::UpsertTwinResponse;
 
 #[allow(clippy::too_many_arguments)]
 pub async fn upsert_twin(

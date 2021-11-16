@@ -6,41 +6,41 @@ use prost_types::Timestamp;
 use tonic::transport::Channel;
 use tonic::Code;
 
-use crate::api::common::{
+use crate::client::iotics::api::create_feed_request::{
+    Arguments as CreateFeedRequestArguments, Payload as CreateFeedRequestPayload,
+};
+use crate::client::iotics::api::describe_feed_request::Arguments as DescribeFeedRequestArguments;
+use crate::client::iotics::api::share_feed_data_request::{
+    Arguments as ShareFeedDataRequestArguments, Payload as ShareFeedDataRequestPayload,
+};
+use crate::client::iotics::api::update_feed_request::{
+    Arguments as UpdateFeedRequestArguments, Payload as UpdateFeedRequestPayload,
+};
+use crate::client::iotics::api::Feed;
+use crate::client::iotics::api::{
+    CreateFeedRequest, DescribeFeedRequest, ShareFeedDataRequest, UpdateFeedRequest,
+};
+use crate::client::iotics::api::{
     FeedData, FeedId, GeoLocation, Headers, HostId, LabelUpdate, LangLiteral, Property, Tags,
     TwinId, Value as FeedValue, Values as FeedValues, Visibility,
 };
-use crate::api::feed::create_feed_request::{
-    Arguments as CreateFeedRequestArguments, Payload as CreateFeedRequestPayload,
-};
-use crate::api::feed::describe_feed_request::Arguments as DescribeFeedRequestArguments;
-use crate::api::feed::share_feed_data_request::{
-    Arguments as ShareFeedDataRequestArguments, Payload as ShareFeedDataRequestPayload,
-};
-use crate::api::feed::update_feed_request::{
-    Arguments as UpdateFeedRequestArguments, Payload as UpdateFeedRequestPayload,
-};
-use crate::api::feed::Feed;
-use crate::api::feed::{
-    CreateFeedRequest, DescribeFeedRequest, ShareFeedDataRequest, UpdateFeedRequest,
-};
 
-use crate::api::twin::create_twin_request::Payload as CreateTwinRequestPayload;
-use crate::api::twin::delete_twin_request::Arguments as DeleteTwinRequestArguments;
-use crate::api::twin::describe_twin_request::Arguments as DescribeTwinRequestArguments;
-use crate::api::twin::update_twin_request::{
+use crate::client::iotics::api::create_twin_request::Payload as CreateTwinRequestPayload;
+use crate::client::iotics::api::delete_twin_request::Arguments as DeleteTwinRequestArguments;
+use crate::client::iotics::api::describe_twin_request::Arguments as DescribeTwinRequestArguments;
+use crate::client::iotics::api::update_twin_request::{
     Arguments as UpdateTwinRequestArguments, Payload as UpdateTwinRequestPayload,
 };
-use crate::api::twin::{
+use crate::client::iotics::api::{
     CreateTwinRequest, DeleteTwinRequest, DescribeTwinRequest, GeoLocationUpdate,
     ListAllTwinsRequest, PropertyUpdate, UpdateTwinRequest, VisibilityUpdate,
 };
 
-pub use crate::api::feed::feed_api_client::FeedApiClient;
-pub use crate::api::feed::DescribeFeedResponse;
-pub use crate::api::interest::{FetchInterestRequest, FetchInterestResponse};
-pub use crate::api::twin::twin_api_client::TwinApiClient;
-pub use crate::api::twin::{DescribeTwinResponse, ListAllTwinsResponse, Twin};
+pub use crate::client::iotics::api::feed_api_client::FeedApiClient;
+pub use crate::client::iotics::api::twin_api_client::TwinApiClient;
+pub use crate::client::iotics::api::DescribeFeedResponse;
+pub use crate::client::iotics::api::{DescribeTwinResponse, ListAllTwinsResponse, Twin};
+pub use crate::client::iotics::api::{FetchInterestRequest, FetchInterestResponse};
 
 use crate::helpers::generate_client_app_id;
 

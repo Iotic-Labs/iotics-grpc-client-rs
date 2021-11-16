@@ -1,12 +1,12 @@
 mod helpers;
 
 #[allow(clippy::module_inception)]
-mod api {
-    pub mod common;
-    pub mod feed;
-    pub mod interest;
-    pub mod search;
-    pub mod twin;
+mod client {
+    #[path = ""]
+    pub mod iotics {
+        #[path = "iotics.api.rs"]
+        pub mod api;
+    }
 
     #[path = ""]
     pub mod google {

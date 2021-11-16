@@ -1,26 +1,26 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let types_to_derive = vec![
-        ".common.Uri",
-        ".common.StringLiteral",
-        ".common.LangLiteral",
-        ".common.Literal",
-        ".common.Property.Value",
-        ".common.Property",
-        ".common.GeoLocation",
-        ".common.GeoCircle",
-        ".common.Value",
-        ".common.TwinID",
-        ".common.FeedID",
-        ".feed.Feed",
-        ".feed.UpsertFeedWithMeta",
-        ".search.SearchRequest.Payload.Filter",
-        ".search.SearchResponse.FeedDetails",
-        ".search.SearchResponse.TwinDetails",
+        "Uri",
+        "StringLiteral",
+        "LangLiteral",
+        "Literal",
+        "Property",
+        "Property.value",
+        "GeoLocation",
+        "GeoCircle",
+        "Value",
+        "TwinID",
+        "FeedID",
+        "Feed",
+        "UpsertFeedWithMeta",
+        "SearchRequest.Payload.Filter",
+        "SearchResponse.FeedDetails",
+        "SearchResponse.TwinDetails",
     ];
     let derive_ser_der = "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]";
 
     let mut builder = tonic_build::configure()
-        .out_dir("src/api")
+        .out_dir("src/client")
         .build_server(false)
         .format(true);
 
@@ -30,11 +30,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     builder.compile(
         &[
-            "proto/common/service.proto",
-            "proto/search/service.proto",
-            "proto/twin/service.proto",
-            "proto/feed/service.proto",
-            "proto/interest/service.proto",
+            "proto/iotics/api/common.proto",
+            "proto/iotics/api/search.proto",
+            "proto/iotics/api/twin.proto",
+            "proto/iotics/api/feed.proto",
+            "proto/iotics/api/interest.proto",
         ],
         &["proto"],
     )?;
