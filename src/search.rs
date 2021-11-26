@@ -8,11 +8,13 @@ use tonic::transport::Channel;
 
 pub use crate::client::iotics::api::search_api_client::SearchApiClient;
 pub use crate::client::iotics::api::search_request::payload::Filter;
-pub use crate::client::iotics::api::search_response::{FeedDetails, TwinDetails};
+pub use crate::client::iotics::api::search_response::{
+    FeedDetails, Payload as SearchResponsePayload, TwinDetails,
+};
 pub use crate::client::iotics::api::{ResponseType, SearchRequest, SearchResponse};
 pub const SEARCH_PAGE_SIZE: u32 = 100;
 
-use crate::client::iotics::api::search_request::Payload;
+use crate::client::iotics::api::search_request::Payload as SearchRequestPayload;
 use crate::client::iotics::api::{Headers, Limit, Offset, Range, Scope, SubscriptionHeaders};
 use crate::helpers::generate_client_app_id;
 
@@ -157,7 +159,7 @@ async fn search_page(
         ..Default::default()
     };
 
-    let payload = Payload {
+    let payload = SearchRequestPayload {
         filter: Some(filter),
         response_type: ResponseType::Full as i32,
         ..Default::default()
