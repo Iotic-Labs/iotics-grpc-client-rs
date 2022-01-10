@@ -199,9 +199,12 @@ pub async fn update_twin(
         twin_id: Some(twin_id.clone()),
     };
 
+    let property_keys = properties.clone().into_iter().map(|p| p.key).collect();
+
     let payload = UpdateTwinRequestPayload {
         properties: Some(PropertyUpdate {
             cleared_all,
+            deleted_by_key: property_keys,
             added: properties,
             ..Default::default()
         }),
