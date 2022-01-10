@@ -4,7 +4,10 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc::{channel, Receiver};
 use tonic::metadata::{Ascii, MetadataValue};
-use tonic::transport::Channel;
+
+use crate::auth_builder::IntoAuthBuilder;
+use crate::client::iotics::api::search_request::Payload as SearchRequestPayload;
+use crate::client::iotics::api::SubscriptionHeaders;
 
 pub use crate::client::iotics::api::search_api_client::SearchApiClient;
 pub use crate::client::iotics::api::search_request::payload::Filter;
@@ -12,36 +15,48 @@ pub use crate::client::iotics::api::search_response::{
     FeedDetails, Payload as SearchResponsePayload, TwinDetails,
 };
 pub use crate::client::iotics::api::{ResponseType, SearchRequest, SearchResponse};
-pub const SEARCH_PAGE_SIZE: u32 = 100;
 
-use crate::client::iotics::api::search_request::Payload as SearchRequestPayload;
-use crate::client::iotics::api::{Headers, Limit, Offset, Range, Scope, SubscriptionHeaders};
+use crate::common::{Channel, Headers, Limit, Offset, Range, Scope};
 use crate::helpers::generate_client_app_id;
 
+pub const SEARCH_PAGE_SIZE: u32 = 100;
+
 pub async fn create_search_api_client(
-    host_address: &str,
+    auth_builder: Arc<impl IntoAuthBuilder>,
 ) -> Result<SearchApiClient<Channel>, anyhow::Error> {
-    let client = SearchApiClient::connect(host_address.to_string()).await?;
+    let host_address = auth_builder.get_host()?;
+    let client = SearchApiClient::connect(host_address).await?;
 
     Ok(client)
 }
 
 pub async fn search(
-    host_address: &str,
-    token: &str,
+    auth_builder: Arc<impl IntoAuthBuilder>,
     filter: Filter,
     scope: Scope,
     timeout: Option<Duration>,
 ) -> Result<Receiver<Result<SearchResponse, anyhow::Error>>, anyhow::Error> {
-    let client = create_search_api_client(host_address).await?;
+    let mut client = create_search_api_client(auth_builder.clone()).await?;
+
+    search_with_client(auth_builder, &mut client, filter, scope, timeout).await
+}
+
+pub async fn search_with_client(
+    auth_builder: Arc<impl IntoAuthBuilder>,
+    client: &mut SearchApiClient<Channel>,
+    filter: Filter,
+    scope: Scope,
+    timeout: Option<Duration>,
+) -> Result<Receiver<Result<SearchResponse, anyhow::Error>>, anyhow::Error> {
+    let token = auth_builder.get_token()?;
 
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
     let (tx, rx) = channel::<Result<SearchResponse, anyhow::Error>>(16384);
 
-    let results_client = client.clone();
-    let results_token = token.to_string();
+    let mut results_client = client.clone();
+    let results_token = token.clone();
     let results_client_app_id = client_app_id.clone();
     let results_transaction_ref = transaction_ref.clone();
     let results_filter = filter.clone();
@@ -79,8 +94,8 @@ pub async fn search(
                                     if result.headers.as_ref().unwrap().client_ref
                                         == format!("{}_{}", &results_client_app_id, current_page)
                                     {
-                                        let response = search_page(
-                                            results_client.clone(),
+                                        let response = search_page_with_client(
+                                            &mut results_client,
                                             &results_token,
                                             results_filter.clone(),
                                             scope,
@@ -129,9 +144,9 @@ pub async fn search(
         });
     }
 
-    search_page(
+    search_page_with_client(
         client,
-        token,
+        &token,
         filter,
         scope,
         0,
@@ -143,8 +158,8 @@ pub async fn search(
     Ok(rx)
 }
 
-async fn search_page(
-    mut client: SearchApiClient<Channel>,
+async fn search_page_with_client(
+    client: &mut SearchApiClient<Channel>,
     token: &str,
     filter: Filter,
     scope: Scope,

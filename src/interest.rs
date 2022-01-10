@@ -1,39 +1,40 @@
 use anyhow::Context;
-use tonic::transport::Channel;
-use tonic::Streaming;
-
-pub use crate::client::iotics::api::interest_api_client::InterestApiClient;
-pub use crate::client::iotics::api::{FetchInterestRequest, FetchInterestResponse};
+use std::sync::Arc;
 
 use crate::client::iotics::api::fetch_interest_request::Arguments;
 use crate::client::iotics::api::interest::FollowedFeed;
 use crate::client::iotics::api::Feed;
 use crate::client::iotics::api::Interest;
-use crate::client::iotics::api::{FeedId, Headers, HostId, TwinId};
+
+pub use crate::client::iotics::api::interest_api_client::InterestApiClient;
+pub use crate::client::iotics::api::{FetchInterestRequest, FetchInterestResponse};
+
+use crate::auth_builder::IntoAuthBuilder;
+use crate::common::{Channel, FeedId, Headers, HostId, Streaming, TwinId};
 use crate::helpers::generate_client_app_id;
 
 pub async fn create_interest_api_client(
-    host_address: &str,
+    auth_builder: Arc<impl IntoAuthBuilder>,
 ) -> Result<InterestApiClient<Channel>, anyhow::Error> {
-    let client = InterestApiClient::connect(host_address.to_string()).await?;
+    let host_address = auth_builder.get_host()?;
+    let client = InterestApiClient::connect(host_address).await?;
 
     Ok(client)
 }
 
 pub async fn follow(
-    host_address: &str,
-    token: &str,
+    auth_builder: Arc<impl IntoAuthBuilder>,
     followed_host_id: Option<HostId>,
     followed_twin_id: TwinId,
     followed_feed: String,
     follower_twin_id: TwinId,
     fetch_last_stored: bool,
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
-    let mut client = create_interest_api_client(host_address).await?;
+    let mut client = create_interest_api_client(auth_builder.clone()).await?;
 
     follow_with_client(
+        auth_builder,
         &mut client,
-        token,
         followed_host_id,
         followed_twin_id,
         followed_feed,
@@ -44,8 +45,8 @@ pub async fn follow(
 }
 
 pub async fn follow_with_client(
+    auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut InterestApiClient<Channel>,
-    token: &str,
     followed_host_id: Option<HostId>,
     followed_twin_id: TwinId,
     followed_feed: String,
@@ -78,6 +79,8 @@ pub async fn follow_with_client(
         }),
         fetch_last_stored: Some(fetch_last_stored),
     });
+
+    let token = auth_builder.get_token()?;
 
     request.metadata_mut().append(
         "authorization",

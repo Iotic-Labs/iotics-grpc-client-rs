@@ -18,6 +18,7 @@ mod client {
     }
 }
 
+pub mod auth_builder;
 pub mod common;
 pub mod interest;
 pub mod search;
