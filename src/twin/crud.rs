@@ -14,17 +14,18 @@ use crate::client::iotics::api::update_twin_request::{
     Arguments as UpdateTwinRequestArguments, Payload as UpdateTwinRequestPayload,
 };
 use crate::client::iotics::api::{
-    CreateFeedRequest, CreateTwinRequest, DeleteTwinRequest, Feed, FeedId, GeoLocation,
-    GeoLocationUpdate, Headers, Property, PropertyUpdate, TwinId, UpdateFeedRequest,
-    UpdateTwinRequest, Values as FeedValues, Visibility, VisibilityUpdate,
+    CreateFeedRequest, CreateTwinRequest, DeleteTwinRequest, Feed, GeoLocationUpdate,
+    UpdateFeedRequest, UpdateTwinRequest, VisibilityUpdate,
 };
 
 use crate::auth_builder::IntoAuthBuilder;
+use crate::common::{
+    FeedId, FeedValue, FeedValues, GeoLocation, Headers, Property, PropertyUpdate, TwinId,
+    Visibility,
+};
 use crate::helpers::generate_client_app_id;
 
-use super::{
-    create_feed_api_client, create_twin_api_client, FeedApiClient, TwinApiClient, TwinFeed,
-};
+use super::{create_feed_api_client, create_twin_api_client, FeedApiClient, TwinApiClient};
 
 pub async fn create_update_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
@@ -48,8 +49,8 @@ pub async fn create_update_twin_with_client(
     let transaction_ref = vec![client_app_id.clone()];
 
     let headers = Headers {
-        client_app_id: client_app_id.clone(),
-        transaction_ref: transaction_ref.clone(),
+        client_app_id,
+        transaction_ref,
         ..Default::default()
     };
 
@@ -76,7 +77,7 @@ pub async fn create_update_twin_with_client(
     client.create_twin(request).await?;
 
     let args = UpdateTwinRequestArguments {
-        twin_id: Some(twin_id.clone()),
+        twin_id: Some(twin_id),
     };
 
     let mut payload = UpdateTwinRequestPayload {
@@ -118,27 +119,25 @@ pub async fn create_update_twin_with_client(
 pub async fn update_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
     did: &str,
-    properties: Vec<Property>,
-    cleared_all: bool,
+    properties: PropertyUpdate,
 ) -> Result<(), anyhow::Error> {
     let mut client = create_twin_api_client(auth_builder.clone()).await?;
 
-    update_twin_with_client(auth_builder, &mut client, did, properties, cleared_all).await
+    update_twin_with_client(auth_builder, &mut client, did, properties).await
 }
 
 pub async fn update_twin_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut TwinApiClient<Channel>,
     did: &str,
-    properties: Vec<Property>,
-    cleared_all: bool,
+    properties: PropertyUpdate,
 ) -> Result<(), anyhow::Error> {
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
     let headers = Headers {
-        client_app_id: client_app_id.clone(),
-        transaction_ref: transaction_ref.clone(),
+        client_app_id,
+        transaction_ref,
         ..Default::default()
     };
 
@@ -147,15 +146,11 @@ pub async fn update_twin_with_client(
     };
 
     let args = UpdateTwinRequestArguments {
-        twin_id: Some(twin_id.clone()),
+        twin_id: Some(twin_id),
     };
 
     let payload = UpdateTwinRequestPayload {
-        properties: Some(PropertyUpdate {
-            cleared_all,
-            added: properties,
-            ..Default::default()
-        }),
+        properties: Some(properties),
         ..Default::default()
     };
 
@@ -179,34 +174,49 @@ pub async fn update_twin_with_client(
 
 pub async fn create_update_feed(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    did: &str,
-    feed: &TwinFeed,
+    twin_did: &str,
+    feed_id: &str,
+    store_last: bool,
+    properties: Vec<Property>,
+    values: Vec<FeedValue>,
 ) -> Result<(), anyhow::Error> {
     let mut client = create_feed_api_client(auth_builder.clone()).await?;
 
-    create_update_feed_with_client(auth_builder, &mut client, did, feed).await
+    create_update_feed_with_client(
+        auth_builder,
+        &mut client,
+        twin_did,
+        feed_id,
+        store_last,
+        properties,
+        values,
+    )
+    .await
 }
 
 pub async fn create_update_feed_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut FeedApiClient<Channel>,
-    did: &str,
-    feed: &TwinFeed,
+    twin_did: &str,
+    feed_id: &str,
+    store_last: bool,
+    properties: Vec<Property>,
+    values: Vec<FeedValue>,
 ) -> Result<(), anyhow::Error> {
     let twin_id = TwinId {
-        value: did.to_string(),
+        value: twin_did.to_string(),
     };
 
     let feed_id = FeedId {
-        value: feed.id.to_string(),
+        value: feed_id.to_string(),
     };
 
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
     let headers = Headers {
-        client_app_id: client_app_id.clone(),
-        transaction_ref: transaction_ref.clone(),
+        client_app_id,
+        transaction_ref,
         ..Default::default()
     };
 
@@ -246,14 +256,14 @@ pub async fn create_update_feed_with_client(
     };
 
     let payload = UpdateFeedRequestPayload {
-        store_last: Some(true),
+        store_last: Some(store_last),
         properties: Some(PropertyUpdate {
             cleared_all: true,
-            added: feed.properties.clone(),
+            added: properties,
             ..Default::default()
         }),
         values: Some(FeedValues {
-            added: feed.values.clone(),
+            added: values,
             ..Default::default()
         }),
     };

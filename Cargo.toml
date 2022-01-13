@@ -2,7 +2,7 @@
 name = "iotics-grpc-client"
 version = "0.1.0"
 authors = ["Mihai Dinculescu <mihai.dinculescu@iotic-labs.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 tonic = { version = "0.6", features = ["tls-webpki-roots"] }

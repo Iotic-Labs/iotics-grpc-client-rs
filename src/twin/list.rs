@@ -25,13 +25,13 @@ pub async fn list_all_twins_with_client(
     let transaction_ref = vec![client_app_id.clone()];
 
     let headers = Headers {
-        client_app_id: client_app_id.clone(),
-        transaction_ref: transaction_ref.clone(),
+        client_app_id,
+        transaction_ref,
         ..Default::default()
     };
 
     let mut request = tonic::Request::new(ListAllTwinsRequest {
-        headers: Some(headers.clone()),
+        headers: Some(headers),
         range: None,
     });
 
