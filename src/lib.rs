@@ -1,4 +1,5 @@
 mod helpers;
+pub mod properties;
 
 #[allow(clippy::module_inception)]
 mod client {
