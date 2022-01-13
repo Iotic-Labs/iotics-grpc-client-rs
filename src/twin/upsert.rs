@@ -49,8 +49,8 @@ pub async fn upsert_twin_with_client(
     let transaction_ref = vec![client_app_id.clone()];
 
     let headers = Headers {
-        client_app_id: client_app_id.clone(),
-        transaction_ref: transaction_ref.clone(),
+        client_app_id,
+        transaction_ref,
         ..Default::default()
     };
 
@@ -63,7 +63,7 @@ pub async fn upsert_twin_with_client(
     };
 
     let mut request = Request::new(UpsertTwinRequest {
-        headers: Some(headers.clone()),
+        headers: Some(headers),
         payload: Some(payload),
     });
 

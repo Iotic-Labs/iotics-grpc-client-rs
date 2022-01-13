@@ -14,14 +14,7 @@ pub use crate::client::iotics::api::{
 };
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, FeedValue, Property};
-
-#[derive(Debug, Clone)]
-pub struct TwinFeed {
-    pub id: String,
-    pub properties: Vec<Property>,
-    pub values: Vec<FeedValue>,
-}
+use crate::common::Channel;
 
 pub async fn create_twin_api_client(
     auth_builder: Arc<impl IntoAuthBuilder>,

@@ -54,8 +54,8 @@ pub async fn share_data_with_client(
     let transaction_ref = vec![client_app_id.clone()];
 
     let headers = Headers {
-        client_app_id: client_app_id.clone(),
-        transaction_ref: transaction_ref.clone(),
+        client_app_id,
+        transaction_ref,
         ..Default::default()
     };
 
@@ -92,7 +92,7 @@ pub async fn share_data_with_client(
     if let Err(e) = result {
         if retry_unknown && e.code() == Code::Unknown {
             let mut request = tonic::Request::new(ShareFeedDataRequest {
-                headers: Some(headers.clone()),
+                headers: Some(headers),
                 args: Some(args),
                 payload: Some(payload),
             });
