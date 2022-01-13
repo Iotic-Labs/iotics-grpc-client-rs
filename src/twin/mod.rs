@@ -8,19 +8,18 @@ use std::sync::Arc;
 
 pub use crate::client::iotics::api::feed_api_client::FeedApiClient;
 pub use crate::client::iotics::api::twin_api_client::TwinApiClient;
-pub use crate::client::iotics::api::DescribeFeedResponse;
-pub use crate::client::iotics::api::UpsertFeedWithMeta;
-pub use crate::client::iotics::api::UpsertTwinResponse;
-pub use crate::client::iotics::api::{DescribeTwinResponse, ListAllTwinsResponse, Twin};
-pub use crate::client::iotics::api::{FetchInterestRequest, FetchInterestResponse};
+pub use crate::client::iotics::api::{
+    DescribeFeedResponse, DescribeTwinResponse, FetchInterestRequest, FetchInterestResponse,
+    ListAllTwinsResponse, Twin, UpsertFeedWithMeta, UpsertTwinResponse,
+};
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, FeedValue};
+use crate::common::{Channel, FeedValue, Property};
 
 #[derive(Debug, Clone)]
 pub struct TwinFeed {
     pub id: String,
-    pub label: String,
+    pub properties: Vec<Property>,
     pub values: Vec<FeedValue>,
 }
 

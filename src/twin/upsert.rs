@@ -7,7 +7,7 @@ use crate::client::iotics::api::upsert_twin_request::Payload as UpsertTwinReques
 use crate::client::iotics::api::UpsertTwinRequest;
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, GeoLocation, Headers, LangLiteral, Property, Response};
+use crate::common::{Channel, GeoLocation, Headers, Property, Response};
 use crate::helpers::generate_client_app_id;
 
 use super::{create_twin_api_client, UpsertFeedWithMeta, UpsertTwinResponse};
@@ -16,7 +16,6 @@ use super::{create_twin_api_client, UpsertFeedWithMeta, UpsertTwinResponse};
 pub async fn upsert_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
     did: &str,
-    labels: Vec<LangLiteral>,
     properties: Vec<Property>,
     feeds: Vec<UpsertFeedWithMeta>,
     location: Option<GeoLocation>,
@@ -28,7 +27,6 @@ pub async fn upsert_twin(
         auth_builder,
         &mut client,
         did,
-        labels,
         properties,
         feeds,
         location,
@@ -42,7 +40,6 @@ pub async fn upsert_twin_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut TwinApiClient<Channel>,
     did: &str,
-    labels: Vec<LangLiteral>,
     properties: Vec<Property>,
     feeds: Vec<UpsertFeedWithMeta>,
     location: Option<GeoLocation>,
@@ -59,12 +56,10 @@ pub async fn upsert_twin_with_client(
 
     let payload = UpsertTwinRequestPayload {
         twin_id: did.to_string(),
-        labels,
         properties,
         feeds,
         location,
         visibility,
-        ..Default::default()
     };
 
     let mut request = Request::new(UpsertTwinRequest {

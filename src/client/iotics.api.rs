@@ -126,39 +126,6 @@ pub struct GeoCircle {
     #[prost(double, tag = "2")]
     pub radius_km: f64,
 }
-/// LabelUpdate describes labels metadata property update: addition and deletion of labels with language.
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LabelUpdate {
-    /// List of labels to be added. (Note: Only one label per language is stored, i.e. any existing ones with the same
-    /// language will be replaced.)
-    #[prost(message, repeated, tag = "1")]
-    pub added: ::prost::alloc::vec::Vec<LangLiteral>,
-    /// List of languages for which to remove labels
-    #[prost(string, repeated, tag = "2")]
-    pub deleted_by_lang: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-}
-/// CommentUpdate describes comments metadata property update: addition and deletion of comments with language.
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CommentUpdate {
-    /// List of labels to be added. (Note: Only one comment per language is stored, i.e. any existing ones with the same
-    /// language will be replaced.)
-    #[prost(message, repeated, tag = "1")]
-    pub added: ::prost::alloc::vec::Vec<LangLiteral>,
-    /// List of languages for which to remove comments
-    #[prost(string, repeated, tag = "2")]
-    pub deleted_by_lang: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-}
-/// Tags describes tags metadata property update: list of tags to be added and deleted. if a tag appears in both lists,
-/// applications may choose to ignore the tags or throw some error.
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Tags {
-    /// List of tags to be added
-    #[prost(string, repeated, tag = "1")]
-    pub added: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    /// List of tags to be deleted
-    #[prost(string, repeated, tag = "2")]
-    pub deleted: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-}
 /// Headers describes the common headers applicable to all the API requests
 /// (except for Search subscribe: see SubscriptionHeaders).
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -272,6 +239,25 @@ pub struct FeedData {
     #[prost(bytes = "vec", tag = "4")]
     pub data: ::prost::alloc::vec::Vec<u8>,
 }
+/// PropertyUpdate describes the update of a twin properties.
+/// Can be used to add, replace, or delete properties. The order of operations is:
+/// clearedAll (if True), deleted, deletedByKey, added.
+/// Note that internal properties (such as location) cannot be modified here.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PropertyUpdate {
+    /// Delete all properties currently set on the twin.
+    #[prost(bool, tag = "1")]
+    pub cleared_all: bool,
+    /// Delete specific exact properties (by key and value). This operation is ignored if clearAll is True.
+    #[prost(message, repeated, tag = "2")]
+    pub deleted: ::prost::alloc::vec::Vec<Property>,
+    /// Delete any properties with the given keys (predicates). This operation is ignored if clearAll is True.
+    #[prost(string, repeated, tag = "3")]
+    pub deleted_by_key: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Adds the given properties
+    #[prost(message, repeated, tag = "4")]
+    pub added: ::prost::alloc::vec::Vec<Property>,
+}
 /// PointType used to describe a point as a FEED or a CONTROL.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -328,11 +314,10 @@ pub mod create_feed_request {
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Payload {
         /// ID of the feed to create
+        ///
+        /// StoreLast indicates if the last received value should be stored of not
         #[prost(message, optional, tag = "1")]
         pub feed_id: ::core::option::Option<super::FeedId>,
-        /// StoreLast indicates if the last received value should be stored of not
-        #[prost(bool, tag = "2")]
-        pub store_last: bool,
     }
     /// Arguments describes the mandatory arguments to identify the twin the feed belongs to.
     #[derive(Clone, PartialEq, ::prost::Message)]
@@ -358,11 +343,10 @@ pub mod create_feed_response {
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Payload {
         /// The created feed
+        ///
+        /// AlreadyCreated indicates if the feed already existed (the create is idempotent)
         #[prost(message, optional, tag = "1")]
         pub feed: ::core::option::Option<super::Feed>,
-        /// AlreadyCreated indicates if the feed already existed (the create is idempotent)
-        #[prost(bool, tag = "2")]
-        pub already_created: bool,
     }
 }
 // ---------------------------------------
@@ -431,18 +415,12 @@ pub mod update_feed_request {
         /// storeLast dictates whether to store the last shared sample of a feed.
         #[prost(message, optional, tag = "1")]
         pub store_last: ::core::option::Option<bool>,
-        /// tags are the set of tags to add or remove.
-        #[prost(message, optional, tag = "2")]
-        pub tags: ::core::option::Option<super::Tags>,
         /// values are descriptive individual data items to add/remove.
         #[prost(message, optional, tag = "3")]
         pub values: ::core::option::Option<super::Values>,
-        /// labels are human-readable set of labels (language-specific) to add or remove.
-        #[prost(message, optional, tag = "4")]
-        pub labels: ::core::option::Option<super::LabelUpdate>,
-        /// comments are the human-readable extended descriptions (language-specific) to add or remove.
-        #[prost(message, optional, tag = "5")]
-        pub comments: ::core::option::Option<super::CommentUpdate>,
+        /// Custom properties to add/remove. Internal properties (such as location) cannot be modified here.
+        #[prost(message, optional, tag = "6")]
+        pub properties: ::core::option::Option<super::PropertyUpdate>,
     }
     /// UpdateFeedRequest arguments.
     #[derive(Clone, PartialEq, ::prost::Message)]
@@ -559,10 +537,6 @@ pub mod list_all_feeds_response {
 pub struct DescribeFeedRequest {
     #[prost(message, optional, tag = "1")]
     pub headers: ::core::option::Option<Headers>,
-    /// Language code for labels and comments. If set, only the label and comment in the given language will be returned
-    /// instead of all. This field does not apply to values and tags which are always returned in full.
-    #[prost(message, optional, tag = "2")]
-    pub lang: ::core::option::Option<::prost::alloc::string::String>,
     /// DescribeFeedRequest mandatory arguments
     #[prost(message, optional, tag = "3")]
     pub args: ::core::option::Option<describe_feed_request::Arguments>,
@@ -593,23 +567,16 @@ pub mod describe_feed_response {
     /// Metadata result databag.
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct MetaResult {
-        /// Labels in all languages set for the feed. (Or: Only label in chosen language, if lang field was specified in the
-        /// request.)
-        #[prost(message, repeated, tag = "1")]
-        pub labels: ::prost::alloc::vec::Vec<super::LangLiteral>,
         /// values semantically describing the share payload of Feed or expected arguments for a Control request
         #[prost(message, repeated, tag = "2")]
         pub values: ::prost::alloc::vec::Vec<super::Value>,
-        #[prost(string, repeated, tag = "3")]
-        pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-        /// Comments in all languages set for the feed. (Or: Only comment in chosen language, if lang field was specified in
-        /// the request.)
-        #[prost(message, repeated, tag = "4")]
-        pub comments: ::prost::alloc::vec::Vec<super::LangLiteral>,
         /// Whether this feed might have its most recent data sample stored. If so, it can be retrieved via FetchLastStored
         /// request. (See interest API)
         #[prost(bool, tag = "5")]
         pub store_last: bool,
+        /// Custom properties associated with this feed.
+        #[prost(message, repeated, tag = "6")]
+        pub properties: ::prost::alloc::vec::Vec<super::Property>,
     }
     /// DescribeFeedResponse payload.
     #[derive(Clone, PartialEq, ::prost::Message)]
@@ -630,18 +597,15 @@ pub struct UpsertFeedWithMeta {
     /// Id of the feed to create/update
     #[prost(string, tag = "1")]
     pub id: ::prost::alloc::string::String,
-    /// Labels are human-readable set of labels (language-specific) to set
-    #[prost(message, repeated, tag = "2")]
-    pub labels: ::prost::alloc::vec::Vec<LangLiteral>,
-    /// Comments are human-readable set of labels (language-specific) to set
-    #[prost(message, repeated, tag = "3")]
-    pub comments: ::prost::alloc::vec::Vec<LangLiteral>,
     /// storeLast dictates whether to store the last shared sample of the feed. Default 'False'
     #[prost(bool, tag = "4")]
     pub store_last: bool,
     /// values to set
     #[prost(message, repeated, tag = "5")]
     pub values: ::prost::alloc::vec::Vec<Value>,
+    /// feed properties to set
+    #[prost(message, repeated, tag = "6")]
+    pub properties: ::prost::alloc::vec::Vec<Property>,
 }
 #[doc = r" Generated client implementations."]
 pub mod feed_api_client {
@@ -807,7 +771,7 @@ pub struct SearchRequest {
     /// Search request scope
     #[prost(enumeration = "Scope", tag = "2")]
     pub scope: i32,
-    /// Search request lang. It implies both search and result text language
+    /// Search request language, applicable to text filtering. If not specified, text search will match any language.
     #[prost(message, optional, tag = "3")]
     pub lang: ::core::option::Option<::prost::alloc::string::String>,
     /// Search request payload
@@ -839,8 +803,8 @@ pub mod search_request {
         #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct Filter {
-            /// Text filtering. One or more keywords which must match either text from twin/feed labels/comments (in the given
-            /// language). Note that any (rather than all) of the keywords will produce a match.
+            /// Text filtering. One or more keywords which must match text from twin properies. Note that any (rather than all)
+            /// of the keywords will produce a match.
             #[prost(message, optional, tag = "1")]
             pub text: ::core::option::Option<::prost::alloc::string::String>,
             /// Location filtering: area within which twins must be located
@@ -876,12 +840,12 @@ pub mod search_response {
         /// Feed
         #[prost(message, optional, tag = "1")]
         pub feed: ::core::option::Option<super::Feed>,
-        /// The feed human readable label in the language specified in the request (if set)
-        #[prost(string, tag = "2")]
-        pub label: ::prost::alloc::string::String,
         /// whether offers the ability to store last received value
         #[prost(bool, tag = "3")]
         pub store_last: bool,
+        /// Feed custom properties.
+        #[prost(message, repeated, tag = "4")]
+        pub properties: ::prost::alloc::vec::Vec<super::Property>,
     }
     /// Search response twin details.
     #[derive(serde::Serialize, serde::Deserialize)]
@@ -894,13 +858,7 @@ pub mod search_response {
         /// Twin location (if set). Included with response type: FULL and LOCATED
         #[prost(message, optional, tag = "2")]
         pub location: ::core::option::Option<super::GeoLocation>,
-        /// Twin human readable label in the language specified in the request (if set). Included with response type: FULL and LOCATED
-        #[prost(string, tag = "3")]
-        pub label: ::prost::alloc::string::String,
-        /// Twin tags. Included with response type: FULL
-        #[prost(string, repeated, tag = "4")]
-        pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-        /// Twin custom properties. Does not include labels/comments/location. Included with response type: FULL
+        /// Twin custom properties.
         #[prost(message, repeated, tag = "5")]
         pub properties: ::prost::alloc::vec::Vec<super::Property>,
         /// Feed details. Included with response type: FULL
@@ -1097,24 +1055,6 @@ pub mod list_all_twins_response {
         pub twins: ::prost::alloc::vec::Vec<super::Twin>,
     }
 }
-/// Message returned by the List service as a stream.
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ListTwinsResponse {
-    #[prost(message, optional, tag = "1")]
-    pub headers: ::core::option::Option<Headers>,
-    #[prost(message, optional, tag = "2")]
-    pub payload: ::core::option::Option<list_twins_response::Payload>,
-}
-/// Nested message and enum types in `ListTwinsResponse`.
-pub mod list_twins_response {
-    /// Payload of listed twins.
-    #[derive(Clone, PartialEq, ::prost::Message)]
-    pub struct Payload {
-        /// the twin - may be omitted if the response code is not a success code
-        #[prost(message, optional, tag = "1")]
-        pub twin: ::core::option::Option<super::Twin>,
-    }
-}
 /// CreateTwinRequest is made to create a twin (idempotent).
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTwinRequest {
@@ -1150,12 +1090,9 @@ pub mod create_twin_response {
     /// Payload identifies the twin which was created.
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Payload {
-        /// created twin
+        /// Unique ID of the twin to delete
         #[prost(message, optional, tag = "1")]
-        pub twin: ::core::option::Option<super::Twin>,
-        /// whether the twin exists already (creating an existing twin is idempotent). Optional, with default=false.
-        #[prost(bool, tag = "2")]
-        pub already_created: bool,
+        pub twin_id: ::core::option::Option<super::TwinId>,
     }
 }
 // ---------------------------------------
@@ -1195,9 +1132,9 @@ pub mod delete_twin_response {
     /// Payload identifies the twin which was deleted.
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Payload {
-        /// Details of twin which was deleted
+        /// Unique ID of the twin to delete
         #[prost(message, optional, tag = "1")]
-        pub twin: ::core::option::Option<super::Twin>,
+        pub twin_id: ::core::option::Option<super::TwinId>,
     }
 }
 /// Description of twin: Provides public metadata lookup for individual resources.
@@ -1205,10 +1142,6 @@ pub mod delete_twin_response {
 pub struct DescribeTwinRequest {
     #[prost(message, optional, tag = "1")]
     pub headers: ::core::option::Option<Headers>,
-    /// Language code for labels and comments. If set, only the label and comment in the given language will be returned
-    /// instead of all. This field does not apply to tags and properties which are always returend in full.
-    #[prost(message, optional, tag = "2")]
-    pub lang: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(message, optional, tag = "3")]
     pub args: ::core::option::Option<describe_twin_request::Arguments>,
 }
@@ -1230,8 +1163,6 @@ pub mod describe_twin_request {
 pub struct FeedMeta {
     #[prost(message, optional, tag = "1")]
     pub feed_id: ::core::option::Option<FeedId>,
-    #[prost(message, repeated, tag = "2")]
-    pub labels: ::prost::alloc::vec::Vec<LangLiteral>,
     #[prost(bool, tag = "3")]
     pub store_last: bool,
 }
@@ -1250,19 +1181,9 @@ pub mod describe_twin_response {
     pub struct MetaResult {
         #[prost(message, optional, tag = "1")]
         pub location: ::core::option::Option<super::GeoLocation>,
-        /// Labels in all languages set for the twin. (Or: Only label in chosen language, if lang field was specified in
-        /// the request.)
-        #[prost(message, repeated, tag = "2")]
-        pub labels: ::prost::alloc::vec::Vec<super::LangLiteral>,
-        /// Comments in all languages set for the twin. (Or: Only comment in chosen language, if lang field was specified
-        /// in the request.)
-        #[prost(message, repeated, tag = "3")]
-        pub comments: ::prost::alloc::vec::Vec<super::LangLiteral>,
         #[prost(message, repeated, tag = "4")]
         pub feeds: ::prost::alloc::vec::Vec<super::FeedMeta>,
-        #[prost(string, repeated, tag = "5")]
-        pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-        /// Custom properties associated with this twin. Does not include labels/comments/location.
+        /// Custom properties associated with this twin.
         #[prost(message, repeated, tag = "6")]
         pub properties: ::prost::alloc::vec::Vec<super::Property>,
     }
@@ -1282,25 +1203,6 @@ pub mod describe_twin_response {
 }
 // ---------------------------------------
 
-/// PropertyUpdate describes the update of a twin properties.
-/// Can be used to add, replace, or delete properties. The order of operations is:
-/// clearedAll (if True), deleted, deletedByKey, added.
-/// Note that internal properties (such as location) cannot be modified here.
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PropertyUpdate {
-    /// Delete all properties currently set on the twin.
-    #[prost(bool, tag = "1")]
-    pub cleared_all: bool,
-    /// Delete specific exact properties (by key and value). This operation is ignored if clearAll is True.
-    #[prost(message, repeated, tag = "2")]
-    pub deleted: ::prost::alloc::vec::Vec<Property>,
-    /// Delete any properties with the given keys (predicates). This operation is ignored if clearAll is True.
-    #[prost(string, repeated, tag = "3")]
-    pub deleted_by_key: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    /// Adds the given properties
-    #[prost(message, repeated, tag = "4")]
-    pub added: ::prost::alloc::vec::Vec<Property>,
-}
 /// VisibilityUpdate describes the update of a twin visibility.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VisibilityUpdate {
@@ -1342,21 +1244,12 @@ pub mod update_twin_request {
     /// tags, visibility, properties, labels, comments, location
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Payload {
-        /// Tags are the set of tags to add or remove.
-        #[prost(message, optional, tag = "1")]
-        pub tags: ::core::option::Option<super::Tags>,
         /// New visibility
         #[prost(message, optional, tag = "2")]
         pub new_visibility: ::core::option::Option<super::VisibilityUpdate>,
         /// Custom properties to add/remove. Internal properties (such as location) cannot be modified here.
         #[prost(message, optional, tag = "3")]
         pub properties: ::core::option::Option<super::PropertyUpdate>,
-        /// Labels are human-readable set of labels (language-specific) to add or remove.
-        #[prost(message, optional, tag = "4")]
-        pub labels: ::core::option::Option<super::LabelUpdate>,
-        /// Comments are the human-readable extended descriptions (language-specific) to add or remove.
-        #[prost(message, optional, tag = "5")]
-        pub comments: ::core::option::Option<super::CommentUpdate>,
         /// Location to be set/unset
         #[prost(message, optional, tag = "6")]
         pub location: ::core::option::Option<super::GeoLocationUpdate>,
@@ -1377,9 +1270,9 @@ pub mod update_twin_response {
     /// UpdateTwinResponse payload.
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Payload {
-        /// Updated Twin
+        /// Unique ID of the twin to delete
         #[prost(message, optional, tag = "1")]
-        pub twin: ::core::option::Option<super::Twin>,
+        pub twin_id: ::core::option::Option<super::TwinId>,
     }
 }
 /// UpsertTwinRequest describes the full state of a twin + its feeds to create or update (full update)
@@ -1403,12 +1296,6 @@ pub mod upsert_twin_request {
         /// Twin visibility. Default value: 'PRIVATE'
         #[prost(enumeration = "super::Visibility", tag = "2")]
         pub visibility: i32,
-        /// Labels are human-readable set of labels (language-specific) to set
-        #[prost(message, repeated, tag = "3")]
-        pub labels: ::prost::alloc::vec::Vec<super::LangLiteral>,
-        /// Comments are human-readable set of labels (language-specific) to set
-        #[prost(message, repeated, tag = "4")]
-        pub comments: ::prost::alloc::vec::Vec<super::LangLiteral>,
         /// Twin Properties to set
         #[prost(message, repeated, tag = "5")]
         pub properties: ::prost::alloc::vec::Vec<super::Property>,

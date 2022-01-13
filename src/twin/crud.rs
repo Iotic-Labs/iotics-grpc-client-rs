@@ -15,8 +15,8 @@ use crate::client::iotics::api::update_twin_request::{
 };
 use crate::client::iotics::api::{
     CreateFeedRequest, CreateTwinRequest, DeleteTwinRequest, Feed, FeedId, GeoLocation,
-    GeoLocationUpdate, Headers, LabelUpdate, LangLiteral, Property, PropertyUpdate, Tags, TwinId,
-    UpdateFeedRequest, UpdateTwinRequest, Values as FeedValues, Visibility, VisibilityUpdate,
+    GeoLocationUpdate, Headers, Property, PropertyUpdate, TwinId, UpdateFeedRequest,
+    UpdateTwinRequest, Values as FeedValues, Visibility, VisibilityUpdate,
 };
 
 use crate::auth_builder::IntoAuthBuilder;
@@ -29,32 +29,19 @@ use super::{
 pub async fn create_update_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
     did: &str,
-    label: &str,
     properties: Vec<Property>,
-    tags: Vec<String>,
     location: Option<GeoLocation>,
 ) -> Result<(), anyhow::Error> {
     let mut client = create_twin_api_client(auth_builder.clone()).await?;
 
-    create_update_twin_with_client(
-        auth_builder,
-        &mut client,
-        did,
-        label,
-        properties,
-        tags,
-        location,
-    )
-    .await
+    create_update_twin_with_client(auth_builder, &mut client, did, properties, location).await
 }
 
 pub async fn create_update_twin_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut TwinApiClient<Channel>,
     did: &str,
-    label: &str,
     properties: Vec<Property>,
-    tags: Vec<String>,
     location: Option<GeoLocation>,
 ) -> Result<(), anyhow::Error> {
     let client_app_id = generate_client_app_id();
@@ -93,23 +80,12 @@ pub async fn create_update_twin_with_client(
     };
 
     let mut payload = UpdateTwinRequestPayload {
-        labels: Some(LabelUpdate {
-            added: vec![LangLiteral {
-                lang: "en".to_string(),
-                value: label.to_string(),
-            }],
-            ..Default::default()
-        }),
         new_visibility: Some(VisibilityUpdate {
             visibility: Visibility::Public as i32,
         }),
         properties: Some(PropertyUpdate {
             cleared_all: true,
             added: properties,
-            ..Default::default()
-        }),
-        tags: Some(Tags {
-            added: tags,
             ..Default::default()
         }),
         ..Default::default()
@@ -240,7 +216,6 @@ pub async fn create_update_feed_with_client(
 
     let payload = CreateFeedRequestPayload {
         feed_id: Some(feed_id.clone()),
-        store_last: true,
     };
 
     let mut request = tonic::Request::new(CreateFeedRequest {
@@ -272,18 +247,15 @@ pub async fn create_update_feed_with_client(
 
     let payload = UpdateFeedRequestPayload {
         store_last: Some(true),
-        labels: Some(LabelUpdate {
-            added: vec![LangLiteral {
-                lang: "en".to_string(),
-                value: feed.label.to_string(),
-            }],
+        properties: Some(PropertyUpdate {
+            cleared_all: true,
+            added: feed.properties.clone(),
             ..Default::default()
         }),
         values: Some(FeedValues {
             added: feed.values.clone(),
             ..Default::default()
         }),
-        ..Default::default()
     };
 
     let mut request = tonic::Request::new(UpdateFeedRequest {

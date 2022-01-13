@@ -30,13 +30,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     builder.compile(
         &[
-            "proto/iotics/api/common.proto",
-            "proto/iotics/api/search.proto",
-            "proto/iotics/api/twin.proto",
-            "proto/iotics/api/feed.proto",
-            "proto/iotics/api/interest.proto",
+            "proto/google/rpc/status.proto",
+            "api/proto/iotics/api/common.proto",
+            "api/proto/iotics/api/search.proto",
+            "api/proto/iotics/api/twin.proto",
+            "api/proto/iotics/api/feed.proto",
+            "api/proto/iotics/api/interest.proto",
         ],
-        &["proto"],
+        &["api/proto", "proto"],
     )?;
 
     Ok(())
