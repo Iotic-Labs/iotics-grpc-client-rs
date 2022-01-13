@@ -21,6 +21,8 @@ jobs:
           override: true
       - uses: davidB/rust-cargo-make@v1
       - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
       - name: Run format
         run: cargo make format
       - name: Run check
