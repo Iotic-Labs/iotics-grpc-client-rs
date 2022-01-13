@@ -47,7 +47,6 @@ pub async fn describe_twin_with_client(
     let mut request = tonic::Request::new(DescribeTwinRequest {
         headers: Some(headers.clone()),
         args: Some(args),
-        lang: None,
     });
 
     let token = auth_builder.get_token()?;
@@ -102,7 +101,6 @@ pub async fn describe_feed_with_client(
     let mut request = tonic::Request::new(DescribeFeedRequest {
         headers: Some(headers.clone()),
         args: Some(args),
-        lang: None,
     });
 
     let token = auth_builder.get_token()?;
