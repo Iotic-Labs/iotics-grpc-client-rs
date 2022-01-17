@@ -1,7 +1,10 @@
 [package]
 name = "iotics-grpc-client"
-version = "0.1.0"
-authors = ["Mihai Dinculescu <mihai.dinculescu@iotic-labs.com>"]
+version = "0.2.1"
+description = "IOTICS gRPC client"
+license = "Apache-2.0"
+repository = "https://github.com/Iotic-Labs/iotics-grpc-client-rs"
+homepage = "https://iotics.com"
 edition = "2021"
 
 [dependencies]

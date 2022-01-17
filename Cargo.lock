@@ -302,7 +302,7 @@ dependencies = [
 
 [[package]]
 name = "iotics-grpc-client"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "prost",
