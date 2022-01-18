@@ -6,6 +6,10 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+### Fixed
+
+- docs.rs build should now succeed
+
 ## [v0.2.1] - 2022-01-18
 
 ### Initial release of iotics-grpc-client

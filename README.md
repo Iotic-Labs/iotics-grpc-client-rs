@@ -13,6 +13,8 @@ IOTICS gRPC client in Rust.
 iotics-grpc-client = "0.2"
 ```
 
+[API Docs][api_docs]
+
 ## Contributing
 
 ### Proto files
@@ -49,6 +51,7 @@ Should contain a summary of the changes in [CHANGELOG.md](README.md) under the U
 [dependencies]: https://deps.rs/repo/github/Iotic-Labs/iotics-grpc-client-rs
 [license_badge]: https://img.shields.io/crates/l/iotics-grpc-client.svg
 [license]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/blob/main/LICENSE
+[api_docs]: https://docs.rs/iotics-grpc-client/latest
 [api_remote]: https://github.com/Iotic-Labs/api
 [google_proto_local]: proto/google/rpc/status.proto
 [cargo_version]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/blob/main/Cargo.toml#L3
