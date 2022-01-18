@@ -34,6 +34,7 @@ Should contain a summary of the changes in [CHANGELOG.md](README.md) under the U
 - Tag the commit and push the changes to `main`
 
 ```bash
+    git push
     git tag -a vX.X.X
     git push origin vX.X.X
 ```
