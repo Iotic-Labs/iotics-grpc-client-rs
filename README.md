@@ -32,8 +32,8 @@ Should contain a summary of the changes in [CHANGELOG.md](README.md) under the U
 - Tag the commit and push the changes to `main`
 
 ```bash
-    git tag -a v0.2.0
-    git push origin v0.2.0
+    git tag -a vX.X.X
+    git push origin vX.X.X
 ```
 
 - Release\
