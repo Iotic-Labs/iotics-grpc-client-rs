@@ -6,6 +6,12 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+## [v0.2.3] - 2022-01-19
+
+### Added
+
+- Added connector common keys
+
 ## [v0.2.2] - 2022-01-18
 
 ### Fixed
@@ -17,5 +23,6 @@ file. This change log follows the conventions of
 ### Initial release of iotics-grpc-client
 
 [unreleased]: https://github.com/Iotic-Labs/iotics-grpc-client-rs
+[v0.2.3]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.3
 [v0.2.2]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.2
 [v0.2.1]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.1
