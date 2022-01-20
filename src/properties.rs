@@ -21,6 +21,8 @@ pub mod common_keys {
         pub const HOST_ALLOW_LIST_PROPERTY: &str = "http://data.iotics.com/public#hostAllowList";
 
         // portal
+        pub const SPACE_NAME_PROPERTY: &str = "https://data.iotics.com/app#spaceName";
+        pub const COLOR_PROPERTY: &str = "https://data.iotics.com/app#color";
         pub const CREATED_AT_PROPERTY: &str = "https://data.iotics.com/app#createdAt";
         pub const UPDATED_AT_PROPERTY: &str = "https://data.iotics.com/app#updatedAt";
         pub const CREATED_BY_PROPERTY: &str = "https://data.iotics.com/app#createdBy";
@@ -29,6 +31,7 @@ pub mod common_keys {
 
     pub mod object {
         // models
+        pub const MODEL_PROPERTY: &str = "https://data.iotics.com/app#Model";
         pub const BY_MODEL_PROPERTY: &str = "https://data.iotics.com/app#ByModel";
 
         // interactions
@@ -37,8 +40,15 @@ pub mod common_keys {
         pub const BY_INTERACTION_PROPERTY: &str = "https://data.iotics.com/app#ByInteraction";
         pub const INTERACTION_PROPERTY: &str = "https://data.iotics.com/app#Interaction";
 
+        // connectors
+        pub const BY_PUBLIC_CONNECTOR_PROPERTY: &str =
+            "https://data.iotics.com/app#ByPublicConnector";
+
         // allow list
         pub const ALL_HOST_PROPERTY: &str = "http://data.iotics.com/public#allHosts";
+
+        // misc
+        pub const SET_LATER_PROPERTY: &str = "<SET-LATER>";
     }
 }
 pub struct PropertyBuilder;
