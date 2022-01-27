@@ -6,6 +6,10 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+### Changed
+
+- `list_all_twins` and `list_all_twins_with_client` now take `limit` and `offset` parameters.
+
 ## [v0.2.3] - 2022-01-19
 
 ### Added
