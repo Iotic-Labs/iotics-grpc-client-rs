@@ -6,6 +6,8 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+## [v0.2.4] - 2022-01-27
+
 ### Changed
 
 - `list_all_twins` and `list_all_twins_with_client` now take `limit` and `offset` parameters.
@@ -27,6 +29,7 @@ file. This change log follows the conventions of
 ### Initial release of iotics-grpc-client
 
 [unreleased]: https://github.com/Iotic-Labs/iotics-grpc-client-rs
+[v0.2.4]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.4
 [v0.2.3]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.3
 [v0.2.2]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.2
 [v0.2.1]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.1
