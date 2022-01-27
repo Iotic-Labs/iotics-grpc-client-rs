@@ -35,7 +35,7 @@ Should contain a summary of the changes in [CHANGELOG.md](README.md) under the U
 
 ```bash
     git push
-    git tag -a vX.X.X
+    git tag -a vX.X.X -m "vX.X.X"
     git push origin vX.X.X
 ```
 

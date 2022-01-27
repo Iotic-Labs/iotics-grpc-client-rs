@@ -18,8 +18,7 @@ pub use crate::client::iotics::api::{ResponseType, SearchRequest, SearchResponse
 
 use crate::common::{Channel, Headers, Limit, Offset, Range, Scope};
 use crate::helpers::generate_client_app_id;
-
-pub const SEARCH_PAGE_SIZE: u32 = 100;
+use crate::twin::PAGE_SIZE;
 
 pub async fn create_search_api_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
@@ -88,10 +87,14 @@ pub async fn search_with_client(
 
                         while let Ok(Some(result)) = stream.message().await {
                             if let Some(payload) = &result.payload {
-                                if payload.twins.len() >= SEARCH_PAGE_SIZE as usize {
+                                if payload.twins.len() >= PAGE_SIZE as usize {
                                     let current_page = page.load(Ordering::SeqCst);
 
-                                    if result.headers.as_ref().unwrap().client_ref
+                                    if result
+                                        .headers
+                                        .as_ref()
+                                        .expect("this should not happen")
+                                        .client_ref
                                         == format!("{}_{}", &results_client_app_id, current_page)
                                     {
                                         let response = search_page_with_client(
@@ -186,11 +189,9 @@ async fn search_page_with_client(
         payload: Some(payload),
         headers: Some(headers),
         range: Some(Range {
-            limit: Some(Limit {
-                value: SEARCH_PAGE_SIZE,
-            }),
+            limit: Some(Limit { value: PAGE_SIZE }),
             offset: Some(Offset {
-                value: SEARCH_PAGE_SIZE * page,
+                value: PAGE_SIZE * page,
             }),
         }),
     });
