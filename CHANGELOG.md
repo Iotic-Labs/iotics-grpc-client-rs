@@ -6,6 +6,10 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+### Changed
+
+- `list_all_twins` has been reworked to perform the pagination internally.
+
 ## [v0.2.4] - 2022-01-27
 
 ### Changed

@@ -16,6 +16,8 @@ pub use crate::client::iotics::api::{
 use crate::auth_builder::IntoAuthBuilder;
 use crate::common::Channel;
 
+pub const PAGE_SIZE: u32 = 100;
+
 pub async fn create_twin_api_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
 ) -> Result<TwinApiClient<Channel>, anyhow::Error> {
