@@ -6,6 +6,8 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+## [v0.2.6] - 2022-02-02
+
 ### Changed
 
 - Errors bubbled up from host requests have the transaction references included.
@@ -39,6 +41,7 @@ file. This change log follows the conventions of
 ### Initial release of iotics-grpc-client
 
 [unreleased]: https://github.com/Iotic-Labs/iotics-grpc-client-rs
+[v0.2.6]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.6
 [v0.2.5]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.5
 [v0.2.4]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.4
 [v0.2.3]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.3
