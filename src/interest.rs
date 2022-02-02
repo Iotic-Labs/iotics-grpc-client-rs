@@ -54,10 +54,11 @@ pub async fn follow_with_client(
     fetch_last_stored: bool,
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
     let client_app_id = generate_client_app_id();
+    let transaction_ref = vec![client_app_id.clone()];
 
     let headers = Headers {
-        client_app_id: client_app_id.clone(),
-        transaction_ref: vec![client_app_id],
+        client_app_id,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -87,7 +88,16 @@ pub async fn follow_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    let stream = client.fetch_interests(request).await?.into_inner();
+    let stream = client
+        .fetch_interests(request)
+        .await
+        .with_context(|| {
+            format!(
+                "Fetching interests failed, transaction ref [{}]",
+                transaction_ref.join(", ")
+            )
+        })?
+        .into_inner();
 
     Ok(stream)
 }

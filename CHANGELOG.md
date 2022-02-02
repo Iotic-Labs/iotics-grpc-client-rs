@@ -6,6 +6,10 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+### Changed
+
+- Errors bubbled up from host requests have the transaction references included.
+
 ## [v0.2.5] - 2022-01-31
 
 ### Changed

@@ -26,7 +26,7 @@ pub async fn list_all_twins_with_client(
 
     let headers = Headers {
         client_app_id,
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -52,7 +52,12 @@ pub async fn list_all_twins_with_client(
             token.parse().context("parse token failed")?,
         );
 
-        let result = client.list_all_twins(request).await?;
+        let result = client.list_all_twins(request).await.with_context(|| {
+            format!(
+                "Listing twins failed, transaction ref [{}]",
+                transaction_ref.join(", ")
+            )
+        })?;
         let result = result.into_inner();
 
         let payload = result.payload.context("failed to find payload")?;

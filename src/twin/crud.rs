@@ -50,7 +50,7 @@ pub async fn create_update_twin_with_client(
 
     let headers = Headers {
         client_app_id,
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -74,7 +74,12 @@ pub async fn create_update_twin_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    client.create_twin(request).await?;
+    client.create_twin(request).await.with_context(|| {
+        format!(
+            "Creating twin failed, transaction ref [{}]",
+            transaction_ref.join(", ")
+        )
+    })?;
 
     let args = UpdateTwinRequestArguments {
         twin_id: Some(twin_id),
@@ -111,7 +116,12 @@ pub async fn create_update_twin_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    client.update_twin(request).await?;
+    client.update_twin(request).await.with_context(|| {
+        format!(
+            "Updating twin failed, transaction ref [{}]",
+            transaction_ref.join(", ")
+        )
+    })?;
 
     Ok(())
 }
@@ -137,7 +147,7 @@ pub async fn update_twin_with_client(
 
     let headers = Headers {
         client_app_id,
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -167,7 +177,12 @@ pub async fn update_twin_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    client.update_twin(request).await?;
+    client.update_twin(request).await.with_context(|| {
+        format!(
+            "Updating twin failed, transaction ref [{}]",
+            transaction_ref.join(", ")
+        )
+    })?;
 
     Ok(())
 }
@@ -216,7 +231,7 @@ pub async fn create_update_feed_with_client(
 
     let headers = Headers {
         client_app_id,
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -241,10 +256,12 @@ pub async fn create_update_feed_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    client
-        .create_feed(request)
-        .await
-        .context("create feed failed")?;
+    client.create_feed(request).await.with_context(|| {
+        format!(
+            "Creating feed failed, transaction ref [{}]",
+            transaction_ref.join(", ")
+        )
+    })?;
 
     let args = UpdateFeedRequestArguments {
         feed: Some({
@@ -281,10 +298,12 @@ pub async fn create_update_feed_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    client
-        .update_feed(request)
-        .await
-        .context("update feed failed")?;
+    client.update_feed(request).await.with_context(|| {
+        format!(
+            "Updating feed failed, transaction ref [{}]",
+            transaction_ref.join(", ")
+        )
+    })?;
 
     Ok(())
 }
@@ -312,7 +331,7 @@ pub async fn delete_twin_with_client(
 
     let headers = Headers {
         client_app_id,
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -332,7 +351,12 @@ pub async fn delete_twin_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    client.delete_twin(request).await?;
+    client.delete_twin(request).await.with_context(|| {
+        format!(
+            "Deleting twin failed, transaction ref [{}]",
+            transaction_ref.join(", ")
+        )
+    })?;
 
     Ok(())
 }

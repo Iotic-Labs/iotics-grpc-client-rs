@@ -55,7 +55,7 @@ pub async fn share_data_with_client(
 
     let headers = Headers {
         client_app_id,
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -102,9 +102,17 @@ pub async fn share_data_with_client(
                 token.parse().context("parse token failed")?,
             );
 
-            client.share_feed_data(request).await?;
+            client.share_feed_data(request).await.with_context(|| {
+                format!(
+                    "Sharing data failed, transaction ref [{}]",
+                    transaction_ref.join(", ")
+                )
+            })?;
         } else {
-            return Err(e.into());
+            return Err(anyhow::Error::new(e).context(format!(
+                "Sharing data failed, transaction ref [{}]",
+                transaction_ref.join(", ")
+            )));
         }
     }
 
