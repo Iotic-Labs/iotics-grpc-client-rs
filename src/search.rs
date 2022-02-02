@@ -173,7 +173,7 @@ async fn search_page_with_client(
     let headers = Headers {
         client_app_id: client_app_id.clone(),
         client_ref: format!("{}_{}", client_app_id, page),
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -201,7 +201,15 @@ async fn search_page_with_client(
         token.parse().expect("Failed to parse token"),
     );
 
-    client.dispatch_search_request(request).await?;
+    client
+        .dispatch_search_request(request)
+        .await
+        .with_context(|| {
+            format!(
+                "Search request failed, transaction ref [{}]",
+                transaction_ref.join(", ")
+            )
+        })?;
 
     Ok(())
 }

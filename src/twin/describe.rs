@@ -35,7 +35,7 @@ pub async fn describe_twin_with_client(
 
     let headers = Headers {
         client_app_id,
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -56,8 +56,12 @@ pub async fn describe_twin_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    let result = client.describe_twin(request).await?;
-
+    let result = client.describe_twin(request).await.with_context(|| {
+        format!(
+            "Describing twin failed, transaction ref [{}]",
+            transaction_ref.join(", ")
+        )
+    })?;
     let result = result.into_inner();
 
     Ok(result)
@@ -86,7 +90,7 @@ pub async fn describe_feed_with_client(
 
     let headers = Headers {
         client_app_id,
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -110,8 +114,12 @@ pub async fn describe_feed_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    let result = client.describe_feed(request).await?;
-
+    let result = client.describe_feed(request).await.with_context(|| {
+        format!(
+            "Describing feed failed, transaction ref [{}]",
+            transaction_ref.join(", ")
+        )
+    })?;
     let result = result.into_inner();
 
     Ok(result)

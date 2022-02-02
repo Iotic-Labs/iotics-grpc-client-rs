@@ -50,7 +50,7 @@ pub async fn upsert_twin_with_client(
 
     let headers = Headers {
         client_app_id,
-        transaction_ref,
+        transaction_ref: transaction_ref.clone(),
         ..Default::default()
     };
 
@@ -74,7 +74,12 @@ pub async fn upsert_twin_with_client(
         token.parse().context("parse token failed")?,
     );
 
-    let response = client.upsert_twin(request).await?;
+    let response = client.upsert_twin(request).await.with_context(|| {
+        format!(
+            "Upserting twin failed, transaction ref [{}]",
+            transaction_ref.join(", ")
+        )
+    })?;
 
     Ok(response)
 }
