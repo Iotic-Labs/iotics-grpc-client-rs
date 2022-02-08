@@ -22,11 +22,7 @@ iotics-grpc-client = "0.2"
 - Are submoduled in [api/](api/) from [https://github.com/Iotic-Labs/api][api_remote].
 - [proto/google/rpc/status.proto][google_proto_local] is included as it's a dependency.
 
-### PRs
-
-Should contain a summary of the changes in [CHANGELOG.md](README.md) under the Unreleased section.
-
-### Updating the API version
+### Incrementing the API version
 
 Run
 
@@ -40,6 +36,16 @@ git add api
 git commit -m "Updated api to vX.X.X"
 git push
 ```
+
+### Updating the API version
+
+```bash
+git submodule update
+```
+
+### PRs
+
+Should contain a summary of the changes in [CHANGELOG.md](README.md) under the Unreleased section.
 
 ### Releasing
 
