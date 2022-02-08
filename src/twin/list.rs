@@ -7,11 +7,11 @@ use crate::auth_builder::IntoAuthBuilder;
 use crate::common::{Channel, Headers, Limit, Offset, Range};
 use crate::helpers::generate_client_app_id;
 
-use super::{create_twin_api_client, Twin, TwinApiClient, PAGE_SIZE};
+use super::{create_twin_api_client, TwinApiClient, TwinDetails, PAGE_SIZE};
 
 pub async fn list_all_twins(
     auth_builder: Arc<impl IntoAuthBuilder>,
-) -> Result<Vec<Twin>, anyhow::Error> {
+) -> Result<Vec<TwinDetails>, anyhow::Error> {
     let mut client = create_twin_api_client(auth_builder.clone()).await?;
 
     list_all_twins_with_client(auth_builder, &mut client).await
@@ -20,7 +20,7 @@ pub async fn list_all_twins(
 pub async fn list_all_twins_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut TwinApiClient<Channel>,
-) -> Result<Vec<Twin>, anyhow::Error> {
+) -> Result<Vec<TwinDetails>, anyhow::Error> {
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 

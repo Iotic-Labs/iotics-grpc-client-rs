@@ -26,6 +26,21 @@ iotics-grpc-client = "0.2"
 
 Should contain a summary of the changes in [CHANGELOG.md](README.md) under the Unreleased section.
 
+### Updating the API version
+
+Run
+
+```bash
+cd api
+git fetch --all --tags
+git checkout tags/vX.X.X
+cd ..
+git add api
+
+git commit -m "Updated api to vX.X.X"
+git push
+```
+
 ### Releasing
 
 - Increment the version in [Cargo.toml][cargo_version]

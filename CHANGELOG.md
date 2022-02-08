@@ -6,6 +6,10 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+### Changed
+
+- Update to the richer `list_all_twins` endpoint which is available starting with host version 3.0.722.
+
 ## [v0.2.6] - 2022-02-02
 
 ### Changed
