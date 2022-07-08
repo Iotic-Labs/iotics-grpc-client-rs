@@ -61,8 +61,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // configure the builder
     let mut builder = tonic_build::configure()
         .out_dir(&client_path)
-        .build_server(false)
-        .format(true);
+        .build_server(false);
 
     for type_to_derive in types_to_derive {
         builder = builder.type_attribute(type_to_derive, derive_ser_der);

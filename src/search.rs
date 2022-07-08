@@ -8,6 +8,9 @@ use tonic::metadata::{Ascii, MetadataValue};
 use crate::auth_builder::IntoAuthBuilder;
 use crate::client::iotics::api::search_request::Payload as SearchRequestPayload;
 use crate::client::iotics::api::SubscriptionHeaders;
+use crate::common::{Channel, Headers, Limit, Offset, Range, Scope};
+use crate::helpers::generate_client_app_id;
+use crate::twin::PAGE_SIZE;
 
 pub use crate::client::iotics::api::search_api_client::SearchApiClient;
 pub use crate::client::iotics::api::search_request::payload::Filter;
@@ -15,10 +18,6 @@ pub use crate::client::iotics::api::search_response::{
     FeedDetails, Payload as SearchResponsePayload, TwinDetails,
 };
 pub use crate::client::iotics::api::{ResponseType, SearchRequest, SearchResponse};
-
-use crate::common::{Channel, Headers, Limit, Offset, Range, Scope};
-use crate::helpers::generate_client_app_id;
-use crate::twin::PAGE_SIZE;
 
 pub async fn create_search_api_client(
     auth_builder: Arc<impl IntoAuthBuilder>,

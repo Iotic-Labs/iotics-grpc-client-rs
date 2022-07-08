@@ -15,6 +15,14 @@ iotics-grpc-client = "0.2"
 
 [API Docs][api_docs]
 
+## Running the examples
+
+Rename `.env-sample` to `.env` and give values to the environment variables.
+
+```bash
+cargo run --example search
+```
+
 ## Contributing
 
 ### Proto files
