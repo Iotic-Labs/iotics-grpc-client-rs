@@ -6,6 +6,14 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+### Added
+
+- Search example.
+
+### Changed
+
+- TLS is now an optional feature which needs to be enabled explicitly.
+
 ## [v0.2.7] - 2022-02-08
 
 ### Changed
