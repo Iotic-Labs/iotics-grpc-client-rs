@@ -6,6 +6,8 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+## [v0.3.0] - 2022-07-08
+
 ### Added
 
 - Search example.
@@ -55,6 +57,7 @@ file. This change log follows the conventions of
 ### Initial release of iotics-grpc-client
 
 [unreleased]: https://github.com/Iotic-Labs/iotics-grpc-client-rs
+[v0.3.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.3.0
 [v0.2.7]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.7
 [v0.2.6]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.6
 [v0.2.5]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.5
