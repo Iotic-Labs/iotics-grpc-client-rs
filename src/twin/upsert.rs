@@ -10,7 +10,7 @@ use crate::auth_builder::IntoAuthBuilder;
 use crate::common::{Channel, GeoLocation, Headers, Property, Response};
 use crate::helpers::generate_client_app_id;
 
-use super::{create_twin_api_client, UpsertFeedWithMeta, UpsertTwinResponse};
+use super::{create_twin_api_client, UpsertFeedWithMeta, UpsertInputWithMeta, UpsertTwinResponse};
 
 #[allow(clippy::too_many_arguments)]
 pub async fn upsert_twin(
@@ -18,6 +18,7 @@ pub async fn upsert_twin(
     did: &str,
     properties: Vec<Property>,
     feeds: Vec<UpsertFeedWithMeta>,
+    inputs: Vec<UpsertInputWithMeta>,
     location: Option<GeoLocation>,
     visibility: i32,
 ) -> Result<Response<UpsertTwinResponse>, anyhow::Error> {
@@ -29,6 +30,7 @@ pub async fn upsert_twin(
         did,
         properties,
         feeds,
+        inputs,
         location,
         visibility,
     )
@@ -42,6 +44,7 @@ pub async fn upsert_twin_with_client(
     did: &str,
     properties: Vec<Property>,
     feeds: Vec<UpsertFeedWithMeta>,
+    inputs: Vec<UpsertInputWithMeta>,
     location: Option<GeoLocation>,
     visibility: i32,
 ) -> Result<Response<UpsertTwinResponse>, anyhow::Error> {
@@ -58,6 +61,7 @@ pub async fn upsert_twin_with_client(
         twin_id: did.to_string(),
         properties,
         feeds,
+        inputs,
         location,
         visibility,
     };

@@ -13,6 +13,7 @@ file. This change log follows the conventions of
 ### Changed
 
 - TLS is now an optional feature which needs to be enabled explicitly.
+- Updated to IOTICS API v0.0.12.
 
 ## [v0.2.7] - 2022-02-08
 

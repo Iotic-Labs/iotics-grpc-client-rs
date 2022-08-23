@@ -2,6 +2,7 @@ use anyhow::Context;
 use std::sync::Arc;
 use tonic::transport::Channel;
 
+use crate::client::google::protobuf::BoolValue;
 use crate::client::iotics::api::create_feed_request::{
     Arguments as CreateFeedRequestArguments, Payload as CreateFeedRequestPayload,
 };
@@ -273,7 +274,7 @@ pub async fn create_update_feed_with_client(
     };
 
     let payload = UpdateFeedRequestPayload {
-        store_last: Some(store_last),
+        store_last: Some(BoolValue { value: store_last }),
         properties: Some(PropertyUpdate {
             cleared_all: true,
             added: properties,

@@ -1,8 +1,9 @@
 use anyhow::Context;
-use prost_types::Timestamp;
 use std::sync::Arc;
+use std::time::SystemTime;
 use tonic::Code;
 
+use crate::client::google::protobuf::Timestamp;
 use crate::client::iotics::api::share_feed_data_request::{
     Arguments as ShareFeedDataRequestArguments, Payload as ShareFeedDataRequestPayload,
 };
@@ -66,9 +67,15 @@ pub async fn share_data_with_client(
         }),
     };
 
+    let dtm = std::time::SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
+    let timestamp = Timestamp {
+        seconds: dtm.as_secs() as i64,
+        nanos: 0,
+    };
+
     let payload = ShareFeedDataRequestPayload {
         sample: Some(FeedData {
-            occurred_at: Some(Timestamp::from(std::time::SystemTime::now())),
+            occurred_at: Some(timestamp),
             mime: "application/json".to_string(),
             data,
         }),

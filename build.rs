@@ -39,11 +39,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Value",
         "TwinID",
         "FeedID",
+        "InputID",
         "Feed",
+        "Input",
         "UpsertFeedWithMeta",
+        "UpsertInputWithMeta",
         "SearchRequest.Payload.Filter",
-        "SearchResponse.FeedDetails",
         "SearchResponse.TwinDetails",
+        "SearchResponse.FeedDetails",
+        "SearchResponse.InputDetails",
+        ".google.protobuf.Timestamp",
+        "protobuf.StringValue",
     ];
     let derive_ser_der = "#[derive(serde::Serialize, serde::Deserialize)]#[serde(rename_all(serialize = \"camelCase\", deserialize = \"camelCase\"))]";
 
@@ -61,7 +67,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // configure the builder
     let mut builder = tonic_build::configure()
         .out_dir(&client_path)
-        .build_server(false);
+        .build_server(false)
+        .compile_well_known_types(true);
 
     for type_to_derive in types_to_derive {
         builder = builder.type_attribute(type_to_derive, derive_ser_der);

@@ -13,13 +13,12 @@ tls = ["tonic/tls-webpki-roots"]
 
 [dependencies]
 anyhow = "1.0"
-prost = "0.10"
-prost-types = "0.10"
+prost = "0.11"
 rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 thiserror = "1.0"
-tokio = { version = "1.18", features = ["macros", "rt-multi-thread", "time"] }
-tonic = { version = "0.7" }
+tokio = { version = "1.20", features = ["macros", "rt-multi-thread", "time"] }
+tonic = { version = "0.8" }
 
 [dev-dependencies]
 iotics-identity = { git = "https://github.com/Iotic-Labs/iotics-identity-go.git" }
@@ -28,4 +27,4 @@ log = "0.4"
 pretty_env_logger = "0.4"
 
 [build-dependencies]
-tonic-build = "0.7"
+tonic-build = "0.8"

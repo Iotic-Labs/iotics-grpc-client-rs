@@ -48,7 +48,7 @@ git push
 ### Updating the API version
 
 ```bash
-git submodule update
+git submodule update --remote
 ```
 
 ### PRs
