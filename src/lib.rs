@@ -1,3 +1,6 @@
+// allowed for now because of https://github.com/tokio-rs/prost/issues/332
+#![allow(clippy::derive_partial_eq_without_eq)]
+
 mod helpers;
 pub mod properties;
 
