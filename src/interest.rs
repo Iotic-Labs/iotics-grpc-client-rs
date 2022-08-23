@@ -1,6 +1,7 @@
 use anyhow::Context;
 use std::sync::Arc;
 
+use crate::client::google::protobuf::BoolValue;
 use crate::client::iotics::api::fetch_interest_request::Arguments;
 use crate::client::iotics::api::interest::FollowedFeed;
 use crate::client::iotics::api::Feed;
@@ -78,7 +79,9 @@ pub async fn follow_with_client(
                 follower_twin_id: Some(follower_twin_id),
             }),
         }),
-        fetch_last_stored: Some(fetch_last_stored),
+        fetch_last_stored: Some(BoolValue {
+            value: fetch_last_stored,
+        }),
     });
 
     let token = auth_builder.get_token()?;

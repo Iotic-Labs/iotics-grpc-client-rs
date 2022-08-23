@@ -6,6 +6,7 @@ use tokio::sync::mpsc::{channel, Receiver};
 use tonic::metadata::{Ascii, MetadataValue};
 
 use crate::auth_builder::IntoAuthBuilder;
+use crate::client::google::protobuf::StringValue;
 use crate::client::iotics::api::search_request::Payload as SearchRequestPayload;
 use crate::client::iotics::api::SubscriptionHeaders;
 use crate::common::{Channel, Headers, Limit, Offset, Range, Scope};
@@ -183,7 +184,9 @@ async fn search_page_with_client(
     };
 
     let mut request = tonic::Request::new(SearchRequest {
-        lang: Some("en".to_string()),
+        lang: Some(StringValue {
+            value: "en".to_string(),
+        }),
         scope: scope as i32,
         payload: Some(payload),
         headers: Some(headers),

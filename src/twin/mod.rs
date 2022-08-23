@@ -11,7 +11,7 @@ pub use crate::client::iotics::api::list_all_twins_response::TwinDetails;
 pub use crate::client::iotics::api::twin_api_client::TwinApiClient;
 pub use crate::client::iotics::api::{
     DescribeFeedResponse, DescribeTwinResponse, FetchInterestRequest, FetchInterestResponse,
-    ListAllTwinsResponse, UpsertFeedWithMeta, UpsertTwinResponse,
+    ListAllTwinsResponse, UpsertFeedWithMeta, UpsertInputWithMeta, UpsertTwinResponse,
 };
 
 use crate::auth_builder::IntoAuthBuilder;
