@@ -7,6 +7,11 @@ license = "Apache-2.0"
 repository = "https://github.com/Iotic-Labs/iotics-grpc-client-rs"
 homepage = "https://iotics.com"
 
+[lib]
+# skipping because we don't have any doc tests ourselves
+# however the run fails because of the prost generated comments
+doctest = false
+
 [features]
 default = []
 tls = ["tonic/tls-webpki-roots"]
