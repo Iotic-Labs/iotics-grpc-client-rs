@@ -10,7 +10,7 @@ IOTICS gRPC client in Rust.
 ## Usage
 
 ```toml
-iotics-grpc-client = "0.2"
+iotics-grpc-client = "0.3"
 ```
 
 [API Docs][api_docs]

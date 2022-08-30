@@ -1,6 +1,6 @@
 [package]
 name = "iotics-grpc-client"
-version = "0.2.7"
+version = "0.3.0"
 edition = "2021"
 description = "IOTICS gRPC client"
 license = "Apache-2.0"
