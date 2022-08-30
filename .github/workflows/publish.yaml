@@ -17,6 +17,9 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: '3.x'
       - name: Run cargo login
         run: cargo login ${CRATES_IO_TOKEN}
         env:
