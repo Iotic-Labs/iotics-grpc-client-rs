@@ -8,6 +8,7 @@ include!(concat!(env!("OUT_DIR"), "/client/mod.rs"));
 
 pub mod auth_builder;
 pub mod common;
+pub mod input;
 pub mod interest;
 pub mod search;
 pub mod twin;
