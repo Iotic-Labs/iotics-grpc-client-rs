@@ -20,7 +20,8 @@ iotics-grpc-client = "0.3"
 Rename `.env-sample` to `.env` and give values to the environment variables.
 
 ```bash
-cargo run --example search
+git submodule update --init
+cargo run --features tls --example search
 ```
 
 ## Contributing
