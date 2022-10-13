@@ -20,7 +20,7 @@ iotics-grpc-client = "0.3"
 Rename `.env-sample` to `.env` and give values to the environment variables.
 
 ```bash
-git submodule update --init
+git clone --recurse-submodules git@github.com:Iotic-Labs/iotics-grpc-client-rs.git
 cargo run --features tls --example search
 ```
 
@@ -53,6 +53,13 @@ git submodule update --remote
 ```
 
 ### PRs
+
+Commands to run before creating a PR
+
+```bash
+cargo make format
+cargo make clippy
+```
 
 Should contain a summary of the changes in [CHANGELOG.md](README.md) under the Unreleased section.
 

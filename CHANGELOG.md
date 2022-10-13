@@ -6,6 +6,8 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+### Changed
+
 - BREAKING CHANGE - Update to handle breaking changes in Iotics API, major change here is the change of TwinID Protobuf definition to include hostId (HostTwinDID)
 
 ## [v0.3.0] - 2022-08-30
@@ -18,6 +20,7 @@ file. This change log follows the conventions of
 
 - TLS is now an optional feature which needs to be enabled explicitly.
 - Updated to IOTICS API v0.0.12.
+
 
 ## [v0.2.7] - 2022-02-08
 

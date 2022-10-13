@@ -13,7 +13,7 @@ pub use crate::client::iotics::api::{
 };
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, Headers, HostId, Input, InputId, TwinId};
+use crate::common::{Channel, Headers, InputId};
 use crate::helpers::generate_client_app_id;
 
 pub async fn create_input_api_client(
@@ -53,13 +53,10 @@ pub async fn receive_input_messages_with_client(
     let mut request = tonic::Request::new(ReceiveInputMessageRequest {
         headers: Some(headers),
         args: Some(receive_input_message_request::Arguments {
-            input: Some(Input {
-                id: Some(InputId {
-                    value: input_id.to_string(),
-                }),
-                twin_id: Some(TwinId {
-                    value: twin_id.to_string(),
-                }),
+            input_id: Some(InputId {
+                id: input_id.to_string(),
+                twin_id: twin_id.to_string(),
+                ..Default::default()
             }),
         }),
     });
@@ -150,22 +147,14 @@ pub async fn describe_input_with_client(
         ..Default::default()
     };
 
-    let host_id = remote_host_id.map(|id| HostId {
-        value: id.to_string(),
-    });
-
     let mut request = tonic::Request::new(DescribeInputRequest {
         headers: Some(headers),
         args: Some(describe_input_request::Arguments {
-            input: Some(Input {
-                id: Some(InputId {
-                    value: input_id.to_string(),
-                }),
-                twin_id: Some(TwinId {
-                    value: twin_id.to_string(),
-                }),
+            input_id: Some(InputId {
+                id: input_id.to_string(),
+                twin_id: twin_id.to_string(),
+                host_id: remote_host_id.unwrap_or_default().to_string(),
             }),
-            remote_host_id: host_id,
         }),
     });
 
@@ -215,13 +204,10 @@ pub async fn delete_input_with_client(
     let mut request = tonic::Request::new(DeleteInputRequest {
         headers: Some(headers),
         args: Some(delete_input_request::Arguments {
-            input: Some(Input {
-                id: Some(InputId {
-                    value: input_id.to_string(),
-                }),
-                twin_id: Some(TwinId {
-                    value: twin_id.to_string(),
-                }),
+            input_id: Some(InputId {
+                id: input_id.to_string(),
+                twin_id: twin_id.to_string(),
+                ..Default::default()
             }),
         }),
     });

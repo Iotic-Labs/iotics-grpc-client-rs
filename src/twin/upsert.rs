@@ -7,7 +7,7 @@ use crate::client::iotics::api::upsert_twin_request::Payload as UpsertTwinReques
 use crate::client::iotics::api::UpsertTwinRequest;
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, GeoLocation, Headers, Property, Response};
+use crate::common::{Channel, GeoLocation, Headers, Property, Response, TwinId};
 use crate::helpers::generate_client_app_id;
 
 use super::{create_twin_api_client, UpsertFeedWithMeta, UpsertInputWithMeta, UpsertTwinResponse};
@@ -58,7 +58,10 @@ pub async fn upsert_twin_with_client(
     };
 
     let payload = UpsertTwinRequestPayload {
-        twin_id: did.to_string(),
+        twin_id: Some(TwinId {
+            id: did.to_string(),
+            host_id: "".to_string(),
+        }),
         properties,
         feeds,
         inputs,

@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use crate::client::iotics::api::describe_feed_request::Arguments as DescribeFeedRequestArguments;
 use crate::client::iotics::api::describe_twin_request::Arguments as DescribeTwinRequestArguments;
-use crate::client::iotics::api::{DescribeFeedRequest, DescribeTwinRequest, Feed, HostId};
+use crate::client::iotics::api::{DescribeFeedRequest, DescribeTwinRequest};
 
 use crate::auth_builder::IntoAuthBuilder;
 use crate::common::{Channel, FeedId, Headers, TwinId};
@@ -16,8 +16,8 @@ use super::{
 
 pub async fn describe_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    twin_id: TwinId,
-    remote_host_id: Option<HostId>,
+    twin_id: &str,
+    remote_host_id: Option<&str>,
 ) -> Result<DescribeTwinResponse, anyhow::Error> {
     let mut client = create_twin_api_client(auth_builder.clone()).await?;
 
@@ -27,8 +27,8 @@ pub async fn describe_twin(
 pub async fn describe_twin_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut TwinApiClient<Channel>,
-    twin_id: TwinId,
-    remote_host_id: Option<HostId>,
+    twin_id: &str,
+    remote_host_id: Option<&str>,
 ) -> Result<DescribeTwinResponse, anyhow::Error> {
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
@@ -39,9 +39,13 @@ pub async fn describe_twin_with_client(
         ..Default::default()
     };
 
+    let twin_id_arg = TwinId {
+        id: twin_id.to_string(),
+        host_id: remote_host_id.unwrap_or_default().to_string(),
+    };
+
     let args = DescribeTwinRequestArguments {
-        twin_id: Some(twin_id),
-        remote_host_id,
+        twin_id: Some(twin_id_arg),
     };
 
     let mut request = tonic::Request::new(DescribeTwinRequest {
@@ -69,9 +73,9 @@ pub async fn describe_twin_with_client(
 
 pub async fn describe_feed(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    twin_id: TwinId,
-    feed_id: FeedId,
-    remote_host_id: Option<HostId>,
+    twin_id: &str,
+    feed_id: &str,
+    remote_host_id: Option<&str>,
 ) -> Result<DescribeFeedResponse, anyhow::Error> {
     let mut client = create_feed_api_client(auth_builder.clone()).await?;
 
@@ -81,9 +85,9 @@ pub async fn describe_feed(
 pub async fn describe_feed_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut FeedApiClient<Channel>,
-    twin_id: TwinId,
-    feed_id: FeedId,
-    remote_host_id: Option<HostId>,
+    twin_id: &str,
+    feed_id: &str,
+    remote_host_id: Option<&str>,
 ) -> Result<DescribeFeedResponse, anyhow::Error> {
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
@@ -95,11 +99,11 @@ pub async fn describe_feed_with_client(
     };
 
     let args = DescribeFeedRequestArguments {
-        feed: Some(Feed {
-            id: Some(feed_id),
-            twin_id: Some(twin_id),
+        feed_id: Some(FeedId {
+            id: feed_id.to_string(),
+            twin_id: twin_id.to_string(),
+            host_id: remote_host_id.unwrap_or_default().to_string(),
         }),
-        remote_host_id,
     };
 
     let mut request = tonic::Request::new(DescribeFeedRequest {

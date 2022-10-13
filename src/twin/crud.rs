@@ -15,8 +15,8 @@ use crate::client::iotics::api::update_twin_request::{
     Arguments as UpdateTwinRequestArguments, Payload as UpdateTwinRequestPayload,
 };
 use crate::client::iotics::api::{
-    CreateFeedRequest, CreateTwinRequest, DeleteTwinRequest, Feed, GeoLocationUpdate,
-    UpdateFeedRequest, UpdateTwinRequest, VisibilityUpdate,
+    CreateFeedRequest, CreateTwinRequest, DeleteTwinRequest, GeoLocationUpdate, UpdateFeedRequest,
+    UpdateTwinRequest, VisibilityUpdate,
 };
 
 use crate::auth_builder::IntoAuthBuilder;
@@ -56,11 +56,12 @@ pub async fn create_update_twin_with_client(
     };
 
     let twin_id = TwinId {
-        value: did.to_string(),
+        id: did.to_string(),
+        ..Default::default()
     };
 
     let payload = CreateTwinRequestPayload {
-        twin_id: Some(twin_id.clone()),
+        id: did.to_string(),
     };
 
     let mut request = tonic::Request::new(CreateTwinRequest {
@@ -153,7 +154,8 @@ pub async fn update_twin_with_client(
     };
 
     let twin_id = TwinId {
-        value: did.to_string(),
+        id: did.to_string(),
+        ..Default::default()
     };
 
     let args = UpdateTwinRequestArguments {
@@ -220,11 +222,14 @@ pub async fn create_update_feed_with_client(
     values: Vec<FeedValue>,
 ) -> Result<(), anyhow::Error> {
     let twin_id = TwinId {
-        value: twin_did.to_string(),
+        id: twin_did.to_string(),
+        host_id: "".to_string(),
     };
 
-    let feed_id = FeedId {
-        value: feed_id.to_string(),
+    let feed_id_arg = FeedId {
+        id: feed_id.to_string(),
+        twin_id: twin_did.to_string(),
+        ..Default::default()
     };
 
     let client_app_id = generate_client_app_id();
@@ -237,11 +242,11 @@ pub async fn create_update_feed_with_client(
     };
 
     let args = CreateFeedRequestArguments {
-        twin_id: Some(twin_id.clone()),
+        twin_id: Some(twin_id),
     };
 
     let payload = CreateFeedRequestPayload {
-        feed_id: Some(feed_id.clone()),
+        id: feed_id.to_string(),
     };
 
     let mut request = tonic::Request::new(CreateFeedRequest {
@@ -265,12 +270,7 @@ pub async fn create_update_feed_with_client(
     })?;
 
     let args = UpdateFeedRequestArguments {
-        feed: Some({
-            Feed {
-                id: Some(feed_id),
-                twin_id: Some(twin_id),
-            }
-        }),
+        feed_id: Some(feed_id_arg),
     };
 
     let payload = UpdateFeedRequestPayload {
@@ -327,7 +327,8 @@ pub async fn delete_twin_with_client(
     let transaction_ref = vec![client_app_id.clone()];
 
     let twin_id = TwinId {
-        value: did.to_string(),
+        id: did.to_string(),
+        ..Default::default()
     };
 
     let headers = Headers {
