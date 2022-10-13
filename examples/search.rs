@@ -4,6 +4,7 @@ use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use iotics_grpc_client::{
     common::{GeoCircle, GeoLocation, Scope},
+    host::get_local_host_id,
     search::{search, Filter},
 };
 use log::{error, info, LevelFilter};
@@ -37,6 +38,12 @@ async fn main() {
         text: None,
     };
 
+    let local_host_id_response = get_local_host_id(auth_builder.clone())
+        .await
+        .expect("Failed to get local host id");
+
+    let local_host_id = local_host_id_response.payload.unwrap().host_id;
+
     let mut search_stream = search(
         auth_builder.clone(),
         filter,
@@ -52,9 +59,10 @@ async fn main() {
         match response_result {
             Ok(page) => {
                 if let Some(payload) = page.payload {
-                    let host_str = match payload.remote_host_id {
-                        Some(id) => format!("host {} ", id.value),
-                        None => "local host".to_string(),
+                    let host_str = if payload.host_id == local_host_id {
+                        format!("host {} localhost", payload.host_id)
+                    } else {
+                        format!("host {} ", payload.host_id)
                     };
                     let page = pages_found
                         .entry(host_str.clone())

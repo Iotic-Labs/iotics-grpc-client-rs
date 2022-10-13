@@ -7,8 +7,10 @@ pub mod upsert;
 use std::sync::Arc;
 
 pub use crate::client::iotics::api::feed_api_client::FeedApiClient;
+pub use crate::client::iotics::api::host_api_client::HostApiClient;
 pub use crate::client::iotics::api::list_all_twins_response::TwinDetails;
 pub use crate::client::iotics::api::twin_api_client::TwinApiClient;
+
 pub use crate::client::iotics::api::{
     DescribeFeedResponse, DescribeTwinResponse, FetchInterestRequest, FetchInterestResponse,
     ListAllTwinsResponse, UpsertFeedWithMeta, UpsertInputWithMeta, UpsertTwinResponse,

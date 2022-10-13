@@ -7,10 +7,10 @@ use crate::client::google::protobuf::Timestamp;
 use crate::client::iotics::api::share_feed_data_request::{
     Arguments as ShareFeedDataRequestArguments, Payload as ShareFeedDataRequestPayload,
 };
-use crate::client::iotics::api::{Feed, ShareFeedDataRequest};
+use crate::client::iotics::api::ShareFeedDataRequest;
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, FeedData, FeedId, Headers, TwinId};
+use crate::common::{Channel, FeedData, FeedId, Headers};
 use crate::helpers::generate_client_app_id;
 
 use super::{create_feed_api_client, FeedApiClient};
@@ -43,12 +43,10 @@ pub async fn share_data_with_client(
     data: Vec<u8>,
     retry_unknown: bool,
 ) -> Result<(), anyhow::Error> {
-    let twin_id = TwinId {
-        value: twin_did.to_string(),
-    };
-
     let feed_id = FeedId {
-        value: feed_id.to_string(),
+        id: feed_id.to_string(),
+        twin_id: twin_did.to_string(),
+        ..Default::default()
     };
 
     let client_app_id = generate_client_app_id();
@@ -61,9 +59,10 @@ pub async fn share_data_with_client(
     };
 
     let args = ShareFeedDataRequestArguments {
-        feed: Some(Feed {
-            id: Some(feed_id),
-            twin_id: Some(twin_id),
+        feed_id: Some(FeedId {
+            id: feed_id.id,
+            twin_id: feed_id.twin_id,
+            ..Default::default()
         }),
     };
 

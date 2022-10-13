@@ -78,10 +78,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &[
             "proto/google/rpc/status.proto",
             "api/proto/iotics/api/common.proto",
+            "api/proto/iotics/api/feed.proto",
+            "api/proto/iotics/api/host.proto",
+            "api/proto/iotics/api/input.proto",
+            "api/proto/iotics/api/interest.proto",
+            "api/proto/iotics/api/meta.proto",
             "api/proto/iotics/api/search.proto",
             "api/proto/iotics/api/twin.proto",
-            "api/proto/iotics/api/feed.proto",
-            "api/proto/iotics/api/interest.proto",
         ],
         &["api/proto", "proto"],
     )?;

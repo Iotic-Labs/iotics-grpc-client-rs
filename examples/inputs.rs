@@ -36,6 +36,7 @@ async fn main() {
         sender_twin_id, INPUT_NAME, receiver_twin_id
     );
     info!("Creating twins...");
+
     create_sender(auth_builder.clone(), &sender_twin_id).await;
     create_receiver(auth_builder.clone(), &receiver_twin_id).await;
     activate_receiver_thread(auth_builder.clone(), &receiver_twin_id).await;
