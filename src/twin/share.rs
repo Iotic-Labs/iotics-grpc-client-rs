@@ -15,11 +15,11 @@ use crate::helpers::generate_client_app_id;
 
 use super::{create_feed_api_client, FeedApiClient};
 
-pub async fn share_data(
+pub async fn share_data<T: Into<Vec<u8>>>(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    twin_did: &str,
+    twin_id: &str,
     feed_id: &str,
-    data: Vec<u8>,
+    data: T,
     retry_unknown: bool,
 ) -> Result<(), anyhow::Error> {
     let mut client = create_feed_api_client(auth_builder.clone()).await?;
@@ -27,7 +27,7 @@ pub async fn share_data(
     share_data_with_client(
         auth_builder,
         &mut client,
-        twin_did,
+        twin_id,
         feed_id,
         data,
         retry_unknown,
@@ -35,20 +35,14 @@ pub async fn share_data(
     .await
 }
 
-pub async fn share_data_with_client(
+pub async fn share_data_with_client<T: Into<Vec<u8>>>(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut FeedApiClient<Channel>,
-    twin_did: &str,
+    twin_id: &str,
     feed_id: &str,
-    data: Vec<u8>,
+    data: T,
     retry_unknown: bool,
 ) -> Result<(), anyhow::Error> {
-    let feed_id = FeedId {
-        id: feed_id.to_string(),
-        twin_id: twin_did.to_string(),
-        ..Default::default()
-    };
-
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
@@ -60,8 +54,8 @@ pub async fn share_data_with_client(
 
     let args = ShareFeedDataRequestArguments {
         feed_id: Some(FeedId {
-            id: feed_id.id,
-            twin_id: feed_id.twin_id,
+            id: feed_id.to_string(),
+            twin_id: twin_id.to_string(),
             ..Default::default()
         }),
     };
@@ -76,7 +70,7 @@ pub async fn share_data_with_client(
         sample: Some(FeedData {
             occurred_at: Some(timestamp),
             mime: "application/json".to_string(),
-            data,
+            data: data.into(),
         }),
     };
 
