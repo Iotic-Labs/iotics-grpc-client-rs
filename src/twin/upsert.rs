@@ -15,7 +15,7 @@ use super::{create_twin_api_client, UpsertFeedWithMeta, UpsertInputWithMeta, Ups
 #[allow(clippy::too_many_arguments)]
 pub async fn upsert_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    did: &str,
+    twin_id: &str,
     properties: Vec<Property>,
     feeds: Vec<UpsertFeedWithMeta>,
     inputs: Vec<UpsertInputWithMeta>,
@@ -27,7 +27,7 @@ pub async fn upsert_twin(
     upsert_twin_with_client(
         auth_builder,
         &mut client,
-        did,
+        twin_id,
         properties,
         feeds,
         inputs,
@@ -41,7 +41,7 @@ pub async fn upsert_twin(
 pub async fn upsert_twin_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut TwinApiClient<Channel>,
-    did: &str,
+    twin_id: &str,
     properties: Vec<Property>,
     feeds: Vec<UpsertFeedWithMeta>,
     inputs: Vec<UpsertInputWithMeta>,
@@ -59,8 +59,8 @@ pub async fn upsert_twin_with_client(
 
     let payload = UpsertTwinRequestPayload {
         twin_id: Some(TwinId {
-            id: did.to_string(),
-            host_id: "".to_string(),
+            id: twin_id.to_string(),
+            ..Default::default()
         }),
         properties,
         feeds,

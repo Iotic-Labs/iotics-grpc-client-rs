@@ -30,19 +30,19 @@ use super::{create_feed_api_client, create_twin_api_client, FeedApiClient, TwinA
 
 pub async fn create_update_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    did: &str,
+    twin_id: &str,
     properties: Vec<Property>,
     location: Option<GeoLocation>,
 ) -> Result<(), anyhow::Error> {
     let mut client = create_twin_api_client(auth_builder.clone()).await?;
 
-    create_update_twin_with_client(auth_builder, &mut client, did, properties, location).await
+    create_update_twin_with_client(auth_builder, &mut client, twin_id, properties, location).await
 }
 
 pub async fn create_update_twin_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut TwinApiClient<Channel>,
-    did: &str,
+    twin_id: &str,
     properties: Vec<Property>,
     location: Option<GeoLocation>,
 ) -> Result<(), anyhow::Error> {
@@ -55,13 +55,13 @@ pub async fn create_update_twin_with_client(
         ..Default::default()
     };
 
-    let twin_id = TwinId {
-        id: did.to_string(),
-        ..Default::default()
+    let payload = CreateTwinRequestPayload {
+        id: twin_id.to_string(),
     };
 
-    let payload = CreateTwinRequestPayload {
-        id: did.to_string(),
+    let twin_id = TwinId {
+        id: twin_id.to_string(),
+        ..Default::default()
     };
 
     let mut request = tonic::Request::new(CreateTwinRequest {
@@ -130,18 +130,18 @@ pub async fn create_update_twin_with_client(
 
 pub async fn update_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    did: &str,
+    twin_id: &str,
     properties: PropertyUpdate,
 ) -> Result<(), anyhow::Error> {
     let mut client = create_twin_api_client(auth_builder.clone()).await?;
 
-    update_twin_with_client(auth_builder, &mut client, did, properties).await
+    update_twin_with_client(auth_builder, &mut client, twin_id, properties).await
 }
 
 pub async fn update_twin_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut TwinApiClient<Channel>,
-    did: &str,
+    twin_id: &str,
     properties: PropertyUpdate,
 ) -> Result<(), anyhow::Error> {
     let client_app_id = generate_client_app_id();
@@ -154,7 +154,7 @@ pub async fn update_twin_with_client(
     };
 
     let twin_id = TwinId {
-        id: did.to_string(),
+        id: twin_id.to_string(),
         ..Default::default()
     };
 
@@ -192,7 +192,7 @@ pub async fn update_twin_with_client(
 
 pub async fn create_update_feed(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    twin_did: &str,
+    twin_id: &str,
     feed_id: &str,
     store_last: bool,
     properties: Vec<Property>,
@@ -203,7 +203,7 @@ pub async fn create_update_feed(
     create_update_feed_with_client(
         auth_builder,
         &mut client,
-        twin_did,
+        twin_id,
         feed_id,
         store_last,
         properties,
@@ -215,20 +215,20 @@ pub async fn create_update_feed(
 pub async fn create_update_feed_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut FeedApiClient<Channel>,
-    twin_did: &str,
+    twin_id: &str,
     feed_id: &str,
     store_last: bool,
     properties: Vec<Property>,
     values: Vec<FeedValue>,
 ) -> Result<(), anyhow::Error> {
-    let twin_id = TwinId {
-        id: twin_did.to_string(),
-        host_id: "".to_string(),
-    };
-
     let feed_id_arg = FeedId {
         id: feed_id.to_string(),
-        twin_id: twin_did.to_string(),
+        twin_id: twin_id.to_string(),
+        ..Default::default()
+    };
+
+    let twin_id = TwinId {
+        id: twin_id.to_string(),
         ..Default::default()
     };
 
@@ -311,23 +311,23 @@ pub async fn create_update_feed_with_client(
 
 pub async fn delete_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    did: &str,
+    twin_id: &str,
 ) -> Result<(), anyhow::Error> {
     let mut client = create_twin_api_client(auth_builder.clone()).await?;
 
-    delete_twin_with_client(auth_builder, &mut client, did).await
+    delete_twin_with_client(auth_builder, &mut client, twin_id).await
 }
 
 pub async fn delete_twin_with_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
     client: &mut TwinApiClient<Channel>,
-    did: &str,
+    twin_id: &str,
 ) -> Result<(), anyhow::Error> {
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
     let twin_id = TwinId {
-        id: did.to_string(),
+        id: twin_id.to_string(),
         ..Default::default()
     };
 

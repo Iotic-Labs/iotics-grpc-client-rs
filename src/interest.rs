@@ -32,7 +32,7 @@ pub async fn follow(
     auth_builder: Arc<impl IntoAuthBuilder>,
     followed_host_id: Option<&str>,
     followed_twin_id: &str,
-    followed_feed: String,
+    followed_feed_id: &str,
     follower_twin_id: &str,
     fetch_last_stored: bool,
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
@@ -43,7 +43,7 @@ pub async fn follow(
         &mut client,
         followed_host_id,
         followed_twin_id,
-        followed_feed,
+        followed_feed_id,
         follower_twin_id,
         fetch_last_stored,
     )
@@ -55,7 +55,7 @@ pub async fn follow_with_client(
     client: &mut InterestApiClient<Channel>,
     followed_host_id: Option<&str>,
     followed_twin_id: &str,
-    followed_feed: String,
+    followed_feed_id: &str,
     follower_twin_id: &str,
     fetch_last_stored: bool,
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
@@ -76,7 +76,7 @@ pub async fn follow_with_client(
     let interest = Interest {
         follower_twin_id: Some(follower_twin_id_arg),
         followed_feed_id: Some(FeedId {
-            id: followed_feed,
+            id: followed_feed_id.to_string(),
             twin_id: followed_twin_id.to_string(),
             host_id: followed_host_id.unwrap_or_default().to_string(),
         }),
@@ -155,7 +155,7 @@ pub async fn send_input_message_with_client<T: Into<Vec<u8>>>(
 
     let sender_twin_id = TwinId {
         id: sender_twin_id.to_string(),
-        host_id: "".to_string(),
+        ..Default::default()
     };
 
     let dest_input_id = InputId {
