@@ -7,11 +7,12 @@
 [![license][license_badge]][license]\
 IOTICS gRPC client in Rust.
 
-## Usage
+## Usage and Version Compatibility with Iotics host:
 
-```toml
-iotics-grpc-client = "0.3"
-```
+| iotics-grpc-client-rs | iotics-host |
+|----------------------| ----------- |
+|      `iotics-grpc-client = "2.0.0"`       | `>= 5`       |
+|      `iotics-grpc-client = "0.3.0"`      | `>= 4`     |
 
 [API Docs][api_docs]
 
