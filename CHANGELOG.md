@@ -6,6 +6,8 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+## [v2.0.0] - 2022-10-17
+
 ### Changed
 
 - BREAKING CHANGE - Update to handle breaking changes in Iotics API, major change here is the change of TwinID Protobuf definition to include hostId (HostTwinDID)
@@ -63,6 +65,7 @@ file. This change log follows the conventions of
 ### Initial release of iotics-grpc-client
 
 [unreleased]: https://github.com/Iotic-Labs/iotics-grpc-client-rs
+[v2.0.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v2.0.0
 [v0.3.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.3.0
 [v0.2.7]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.7
 [v0.2.6]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.6
