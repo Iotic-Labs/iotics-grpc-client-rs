@@ -4,6 +4,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc::{channel, Receiver};
 use tonic::metadata::{Ascii, MetadataValue};
+use tonic::transport::Endpoint;
 
 use crate::auth_builder::IntoAuthBuilder;
 use crate::client::google::protobuf::StringValue;
@@ -22,9 +23,16 @@ pub use crate::client::iotics::api::{ResponseType, SearchRequest, SearchResponse
 
 pub async fn create_search_api_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
+    keep_alive_interval: Option<Duration>,
 ) -> Result<SearchApiClient<Channel>, anyhow::Error> {
     let host_address = auth_builder.get_host()?;
-    let client = SearchApiClient::connect(host_address).await?;
+
+    let conn = match keep_alive_interval {
+        Some(ka) => Endpoint::new(host_address)?.http2_keep_alive_interval(ka),
+        None => Endpoint::new(host_address)?,
+    };
+
+    let client = SearchApiClient::new(conn.connect().await?);
 
     Ok(client)
 }
@@ -34,8 +42,9 @@ pub async fn search(
     filter: Filter,
     scope: Scope,
     timeout: Option<Duration>,
+    keep_alive_interval: Option<Duration>,
 ) -> Result<Receiver<Result<SearchResponse, anyhow::Error>>, anyhow::Error> {
-    let mut client = create_search_api_client(auth_builder.clone()).await?;
+    let mut client = create_search_api_client(auth_builder.clone(), keep_alive_interval).await?;
 
     search_with_client(auth_builder, &mut client, filter, scope, timeout).await
 }

@@ -6,6 +6,10 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+### Added
+
+- `create_search_api_client`, `search`, `create_interest_api_client` and `follow` now take an extra `keep_alive_interval` parameter that allows the caller to set a KA interval for the underlying gRPC connection.
+
 ## [v2.0.0] - 2022-10-17
 
 ### Changed
