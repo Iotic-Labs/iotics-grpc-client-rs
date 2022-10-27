@@ -1,6 +1,7 @@
 use anyhow::Context;
 use std::sync::Arc;
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
+use tonic::transport::Endpoint;
 
 use crate::client::google::protobuf::{BoolValue, Timestamp};
 use crate::client::iotics::api::fetch_interest_request::Arguments as FetchInterestArguments;
@@ -21,9 +22,16 @@ use crate::helpers::generate_client_app_id;
 
 pub async fn create_interest_api_client(
     auth_builder: Arc<impl IntoAuthBuilder>,
+    keep_alive_interval: Option<Duration>,
 ) -> Result<InterestApiClient<Channel>, anyhow::Error> {
     let host_address = auth_builder.get_host()?;
-    let client = InterestApiClient::connect(host_address).await?;
+
+    let conn = match keep_alive_interval {
+        Some(ka) => Endpoint::new(host_address)?.http2_keep_alive_interval(ka),
+        None => Endpoint::new(host_address)?,
+    };
+
+    let client = InterestApiClient::new(conn.connect().await?);
 
     Ok(client)
 }
@@ -35,8 +43,9 @@ pub async fn follow(
     followed_feed_id: &str,
     follower_twin_id: &str,
     fetch_last_stored: bool,
+    keep_alive_interval: Option<Duration>,
 ) -> Result<Streaming<FetchInterestResponse>, anyhow::Error> {
-    let mut client = create_interest_api_client(auth_builder.clone()).await?;
+    let mut client = create_interest_api_client(auth_builder.clone(), keep_alive_interval).await?;
 
     follow_with_client(
         auth_builder,
@@ -120,7 +129,7 @@ pub async fn send_input_message<T: Into<Vec<u8>>>(
     sender_twin_id: &str,
     data: T,
 ) -> Result<(), anyhow::Error> {
-    let mut client = create_interest_api_client(auth_builder.clone()).await?;
+    let mut client = create_interest_api_client(auth_builder.clone(), None).await?;
 
     send_input_message_with_client(
         auth_builder,

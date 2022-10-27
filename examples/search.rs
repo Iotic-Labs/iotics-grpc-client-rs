@@ -66,6 +66,7 @@ async fn main() {
         filter,
         Scope::Global,
         Some(Duration::from_secs(10)),
+        None,
     )
     .await
     .expect("search request failed");
