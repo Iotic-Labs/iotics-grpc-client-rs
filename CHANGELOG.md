@@ -6,6 +6,8 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+## [v2.0.1] - 2022-10-31
+
 ### Added
 
 - `create_search_api_client`, `search`, `create_interest_api_client` and `follow` now take an extra `keep_alive_interval` parameter that allows the caller to set a KA interval for the underlying gRPC connection.
@@ -73,6 +75,7 @@ file. This change log follows the conventions of
 ### Initial release of iotics-grpc-client
 
 [unreleased]: https://github.com/Iotic-Labs/iotics-grpc-client-rs
+[v2.0.1]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v2.0.1
 [v2.0.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v2.0.0
 [v0.3.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.3.0
 [v0.2.7]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v0.2.7
