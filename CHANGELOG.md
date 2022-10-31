@@ -10,6 +10,10 @@ file. This change log follows the conventions of
 
 - `create_search_api_client`, `search`, `create_interest_api_client` and `follow` now take an extra `keep_alive_interval` parameter that allows the caller to set a KA interval for the underlying gRPC connection.
 
+### Changed
+
+- Updated to IOTICS API v0.0.16.
+
 ## [v2.0.0] - 2022-10-17
 
 ### Changed
