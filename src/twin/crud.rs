@@ -15,15 +15,12 @@ use crate::client::iotics::api::update_twin_request::{
     Arguments as UpdateTwinRequestArguments, Payload as UpdateTwinRequestPayload,
 };
 use crate::client::iotics::api::{
-    CreateFeedRequest, CreateTwinRequest, DeleteTwinRequest, GeoLocationUpdate, UpdateFeedRequest,
-    UpdateTwinRequest, VisibilityUpdate,
+    CreateFeedRequest, CreateTwinRequest, DeleteTwinRequest, FeedId, GeoLocation,
+    GeoLocationUpdate, Headers, Property, PropertyUpdate, TwinId, UpdateFeedRequest,
+    UpdateTwinRequest, Value as FeedValue, Values as FeedValues, Visibility, VisibilityUpdate,
 };
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{
-    FeedId, FeedValue, FeedValues, GeoLocation, Headers, Property, PropertyUpdate, TwinId,
-    Visibility,
-};
 use crate::helpers::generate_client_app_id;
 
 use super::{create_feed_api_client, create_twin_api_client, FeedApiClient, TwinApiClient};

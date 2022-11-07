@@ -4,13 +4,12 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc::{channel, Receiver};
 use tonic::metadata::{Ascii, MetadataValue};
-use tonic::transport::Endpoint;
+use tonic::transport::{Channel, Endpoint};
 
 use crate::auth_builder::IntoAuthBuilder;
 use crate::client::google::protobuf::StringValue;
 use crate::client::iotics::api::search_request::Payload as SearchRequestPayload;
-use crate::client::iotics::api::SubscriptionHeaders;
-use crate::common::{Channel, Headers, Limit, Offset, Range, Scope};
+use crate::client::iotics::api::{Headers, Limit, Offset, Range, Scope, SubscriptionHeaders};
 use crate::helpers::generate_client_app_id;
 use crate::twin::PAGE_SIZE;
 

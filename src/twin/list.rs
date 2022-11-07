@@ -1,10 +1,10 @@
 use anyhow::Context;
 use std::sync::Arc;
+use tonic::transport::Channel;
 
-use crate::client::iotics::api::ListAllTwinsRequest;
+use crate::client::iotics::api::{Headers, Limit, ListAllTwinsRequest, Offset, Range};
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, Headers, Limit, Offset, Range};
 use crate::helpers::generate_client_app_id;
 
 use super::{create_twin_api_client, TwinApiClient, TwinDetails, PAGE_SIZE};

@@ -1,12 +1,14 @@
 use anyhow::Context;
 use std::sync::Arc;
+use tonic::transport::Channel;
 
 use crate::client::iotics::api::describe_feed_request::Arguments as DescribeFeedRequestArguments;
 use crate::client::iotics::api::describe_twin_request::Arguments as DescribeTwinRequestArguments;
-use crate::client::iotics::api::{DescribeFeedRequest, DescribeTwinRequest};
+use crate::client::iotics::api::{
+    DescribeFeedRequest, DescribeTwinRequest, FeedId, Headers, TwinId,
+};
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, FeedId, Headers, TwinId};
 use crate::helpers::generate_client_app_id;
 
 use super::{

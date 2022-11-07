@@ -1,12 +1,12 @@
 use anyhow::Context;
 use std::result::Result;
 use std::sync::Arc;
+use tonic::transport::Channel;
 
 pub use crate::client::iotics::api::host_api_client::HostApiClient;
-pub use crate::client::iotics::api::{GetHostIdRequest, GetHostIdResponse};
+pub use crate::client::iotics::api::{GetHostIdRequest, GetHostIdResponse, Headers};
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, Headers};
 use crate::helpers::generate_client_app_id;
 
 pub async fn create_host_api_client(

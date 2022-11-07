@@ -1,6 +1,7 @@
 use thiserror::Error;
 
-use crate::common::{LangLiteral, Literal, Property, StringLiteral, Uri, Value};
+use crate::client::iotics::api::property::Value;
+use crate::client::iotics::api::{LangLiteral, Literal, Property, StringLiteral, Uri};
 
 pub mod common_keys {
     pub mod predicate {
