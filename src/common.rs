@@ -1,3 +1,7 @@
+/*
+re-exports to be used by client caller code
+not to be used by this library itself
+*/
 pub use tonic::transport::Channel;
 pub use tonic::{Response, Streaming};
 

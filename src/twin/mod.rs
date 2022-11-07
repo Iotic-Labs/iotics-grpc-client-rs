@@ -6,6 +6,8 @@ pub mod upsert;
 
 use std::sync::Arc;
 
+use tonic::transport::Channel;
+
 pub use crate::client::iotics::api::feed_api_client::FeedApiClient;
 pub use crate::client::iotics::api::host_api_client::HostApiClient;
 pub use crate::client::iotics::api::list_all_twins_response::TwinDetails;
@@ -17,7 +19,6 @@ pub use crate::client::iotics::api::{
 };
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::Channel;
 
 pub const PAGE_SIZE: u32 = 100;
 

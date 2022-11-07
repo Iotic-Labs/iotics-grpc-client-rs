@@ -1,6 +1,7 @@
 use anyhow::Context;
 use std::sync::Arc;
 use tokio::sync::mpsc::{channel, Receiver};
+use tonic::transport::Channel;
 
 pub use crate::client::iotics::api::input_api_client::InputApiClient;
 use crate::client::iotics::api::{
@@ -8,12 +9,11 @@ use crate::client::iotics::api::{
     DeleteInputResponse, DescribeInputResponse,
 };
 pub use crate::client::iotics::api::{
-    DeleteInputRequest, DescribeInputRequest, ReceiveInputMessageRequest,
+    DeleteInputRequest, DescribeInputRequest, Headers, InputId, ReceiveInputMessageRequest,
     ReceiveInputMessageResponse,
 };
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, Headers, InputId};
 use crate::helpers::generate_client_app_id;
 
 pub async fn create_input_api_client(

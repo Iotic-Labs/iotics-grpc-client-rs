@@ -1,13 +1,13 @@
 use anyhow::Context;
 use std::sync::Arc;
-use tonic::Request;
+use tonic::transport::Channel;
+use tonic::{Request, Response};
 
 use crate::client::iotics::api::twin_api_client::TwinApiClient;
 use crate::client::iotics::api::upsert_twin_request::Payload as UpsertTwinRequestPayload;
-use crate::client::iotics::api::UpsertTwinRequest;
+use crate::client::iotics::api::{GeoLocation, Headers, Property, TwinId, UpsertTwinRequest};
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, GeoLocation, Headers, Property, Response, TwinId};
 use crate::helpers::generate_client_app_id;
 
 use super::{create_twin_api_client, UpsertFeedWithMeta, UpsertInputWithMeta, UpsertTwinResponse};

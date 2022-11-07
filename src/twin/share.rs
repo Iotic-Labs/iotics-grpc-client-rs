@@ -1,16 +1,16 @@
 use anyhow::Context;
 use std::sync::Arc;
 use std::time::SystemTime;
+use tonic::transport::Channel;
 use tonic::Code;
 
 use crate::client::google::protobuf::Timestamp;
 use crate::client::iotics::api::share_feed_data_request::{
     Arguments as ShareFeedDataRequestArguments, Payload as ShareFeedDataRequestPayload,
 };
-use crate::client::iotics::api::ShareFeedDataRequest;
+use crate::client::iotics::api::{FeedData, FeedId, Headers, ShareFeedDataRequest};
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, FeedData, FeedId, Headers};
 use crate::helpers::generate_client_app_id;
 
 use super::{create_feed_api_client, FeedApiClient};

@@ -1,7 +1,8 @@
 use anyhow::Context;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
-use tonic::transport::Endpoint;
+use tonic::transport::{Channel, Endpoint};
+use tonic::Streaming;
 
 use crate::client::google::protobuf::{BoolValue, Timestamp};
 use crate::client::iotics::api::fetch_interest_request::Arguments as FetchInterestArguments;
@@ -13,11 +14,11 @@ pub use crate::client::iotics::api::send_input_message_request::{
 };
 
 pub use crate::client::iotics::api::{
-    FetchInterestRequest, FetchInterestResponse, SendInputMessageRequest, SendInputMessageResponse,
+    FeedId, FetchInterestRequest, FetchInterestResponse, Headers, InputId, SendInputMessageRequest,
+    SendInputMessageResponse, TwinId,
 };
 
 use crate::auth_builder::IntoAuthBuilder;
-use crate::common::{Channel, FeedId, Headers, InputId, Streaming, TwinId};
 use crate::helpers::generate_client_app_id;
 
 pub async fn create_interest_api_client(
