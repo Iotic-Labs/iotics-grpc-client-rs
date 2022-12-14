@@ -5,7 +5,7 @@ file. This change log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-
+- Remove of createdAt and updatedAt properties
 ## [v2.0.1] - 2022-10-31
 
 ### Added

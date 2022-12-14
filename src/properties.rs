@@ -23,8 +23,6 @@ pub mod common_keys {
         // portal
         pub const SPACE_NAME_PROPERTY: &str = "https://data.iotics.com/app#spaceName";
         pub const COLOR_PROPERTY: &str = "https://data.iotics.com/app#color";
-        pub const CREATED_AT_PROPERTY: &str = "https://data.iotics.com/app#createdAt";
-        pub const UPDATED_AT_PROPERTY: &str = "https://data.iotics.com/app#updatedAt";
         pub const CREATED_BY_PROPERTY: &str = "https://data.iotics.com/app#createdBy";
         pub const UPDATED_BY_PROPERTY: &str = "https://data.iotics.com/app#updatedBy";
     }
