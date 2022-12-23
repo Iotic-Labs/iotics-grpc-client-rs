@@ -8,9 +8,9 @@ use crate::client::iotics::api::upsert_twin_request::Payload as UpsertTwinReques
 use crate::client::iotics::api::{GeoLocation, Headers, Property, TwinId, UpsertTwinRequest};
 
 use crate::auth_builder::IntoAuthBuilder;
+use crate::channel::create_channel;
 use crate::helpers::generate_client_app_id;
-
-use super::{create_twin_api_client, UpsertFeedWithMeta, UpsertInputWithMeta, UpsertTwinResponse};
+use crate::twin::{UpsertFeedWithMeta, UpsertInputWithMeta, UpsertTwinResponse};
 
 #[allow(clippy::too_many_arguments)]
 pub async fn upsert_twin(
@@ -22,11 +22,10 @@ pub async fn upsert_twin(
     location: Option<GeoLocation>,
     visibility: i32,
 ) -> Result<Response<UpsertTwinResponse>, anyhow::Error> {
-    let mut client = create_twin_api_client(auth_builder.clone()).await?;
-
-    upsert_twin_with_client(
+    let channel = create_channel(auth_builder.clone(), None, None, None).await?;
+    upsert_twin_with_channel(
         auth_builder,
-        &mut client,
+        channel,
         twin_id,
         properties,
         feeds,
@@ -38,9 +37,9 @@ pub async fn upsert_twin(
 }
 
 #[allow(clippy::too_many_arguments)]
-pub async fn upsert_twin_with_client(
+pub async fn upsert_twin_with_channel(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    client: &mut TwinApiClient<Channel>,
+    channel: Channel,
     twin_id: &str,
     properties: Vec<Property>,
     feeds: Vec<UpsertFeedWithMeta>,
@@ -48,6 +47,7 @@ pub async fn upsert_twin_with_client(
     location: Option<GeoLocation>,
     visibility: i32,
 ) -> Result<Response<UpsertTwinResponse>, anyhow::Error> {
+    let mut client = TwinApiClient::new(channel);
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 

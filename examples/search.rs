@@ -2,12 +2,11 @@
 mod auth;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
-use iotics_grpc_client::{
-    common::{GeoCircle, GeoLocation, Scope},
-    host::get_local_host_id,
-    search::{search, Filter},
-    twin::{crud::delete_twin, upsert::upsert_twin},
-};
+use iotics_grpc_client::host::get_local_host_id;
+use iotics_grpc_client::search::{search, Filter};
+use iotics_grpc_client::twin::crud::delete_twin;
+use iotics_grpc_client::twin::upsert::upsert_twin;
+use iotics_grpc_client::{GeoCircle, GeoLocation, Scope};
 use log::{error, info, LevelFilter};
 
 use auth::{generate_twin_did, AuthBuilder, IoticsSettings};
@@ -66,7 +65,6 @@ async fn main() {
         filter,
         Scope::Global,
         Some(Duration::from_secs(10)),
-        None,
     )
     .await
     .expect("search request failed");

@@ -3,11 +3,11 @@ mod auth;
 use serde_json::{from_str, json, Value};
 use std::{str::from_utf8, thread::sleep, time::Duration};
 
-use iotics_grpc_client::common::FeedValue;
 use iotics_grpc_client::input::{delete_input, describe_input, receive_input_messages};
 use iotics_grpc_client::interest::send_input_message;
 use iotics_grpc_client::properties::{common_keys::predicate::COMMENT, PropertyBuilder};
 use iotics_grpc_client::twin::{crud::delete_twin, upsert::upsert_twin, UpsertInputWithMeta};
+use iotics_grpc_client::FeedValue;
 use log::{error, info, LevelFilter};
 use std::sync::Arc;
 

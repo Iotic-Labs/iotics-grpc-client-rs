@@ -2,25 +2,26 @@ use anyhow::Context;
 use std::sync::Arc;
 use tonic::transport::Channel;
 
+use crate::client::iotics::api::twin_api_client::TwinApiClient;
 use crate::client::iotics::api::{Headers, Limit, ListAllTwinsRequest, Offset, Range};
 
 use crate::auth_builder::IntoAuthBuilder;
+use crate::channel::create_channel;
 use crate::helpers::generate_client_app_id;
-
-use super::{create_twin_api_client, TwinApiClient, TwinDetails, PAGE_SIZE};
+use crate::twin::{TwinDetails, PAGE_SIZE};
 
 pub async fn list_all_twins(
     auth_builder: Arc<impl IntoAuthBuilder>,
 ) -> Result<Vec<TwinDetails>, anyhow::Error> {
-    let mut client = create_twin_api_client(auth_builder.clone()).await?;
-
-    list_all_twins_with_client(auth_builder, &mut client).await
+    let channel = create_channel(auth_builder.clone(), None, None, None).await?;
+    list_all_twins_with_channel(auth_builder, channel).await
 }
 
-pub async fn list_all_twins_with_client(
+pub async fn list_all_twins_with_channel(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    client: &mut TwinApiClient<Channel>,
+    channel: Channel,
 ) -> Result<Vec<TwinDetails>, anyhow::Error> {
+    let mut client = TwinApiClient::new(channel);
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 

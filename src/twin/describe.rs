@@ -4,34 +4,33 @@ use tonic::transport::Channel;
 
 use crate::client::iotics::api::describe_feed_request::Arguments as DescribeFeedRequestArguments;
 use crate::client::iotics::api::describe_twin_request::Arguments as DescribeTwinRequestArguments;
+use crate::client::iotics::api::feed_api_client::FeedApiClient;
+use crate::client::iotics::api::twin_api_client::TwinApiClient;
 use crate::client::iotics::api::{
     DescribeFeedRequest, DescribeTwinRequest, FeedId, Headers, TwinId,
 };
 
 use crate::auth_builder::IntoAuthBuilder;
+use crate::channel::create_channel;
 use crate::helpers::generate_client_app_id;
-
-use super::{
-    create_feed_api_client, create_twin_api_client, DescribeFeedResponse, DescribeTwinResponse,
-    FeedApiClient, TwinApiClient,
-};
+use crate::twin::{DescribeFeedResponse, DescribeTwinResponse};
 
 pub async fn describe_twin(
     auth_builder: Arc<impl IntoAuthBuilder>,
     twin_id: &str,
     remote_host_id: Option<&str>,
 ) -> Result<DescribeTwinResponse, anyhow::Error> {
-    let mut client = create_twin_api_client(auth_builder.clone()).await?;
-
-    describe_twin_with_client(auth_builder, &mut client, twin_id, remote_host_id).await
+    let channel = create_channel(auth_builder.clone(), None, None, None).await?;
+    describe_twin_with_channel(auth_builder, channel, twin_id, remote_host_id).await
 }
 
-pub async fn describe_twin_with_client(
+pub async fn describe_twin_with_channel(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    client: &mut TwinApiClient<Channel>,
+    channel: Channel,
     twin_id: &str,
     remote_host_id: Option<&str>,
 ) -> Result<DescribeTwinResponse, anyhow::Error> {
+    let mut client = TwinApiClient::new(channel);
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
@@ -79,18 +78,18 @@ pub async fn describe_feed(
     feed_id: &str,
     remote_host_id: Option<&str>,
 ) -> Result<DescribeFeedResponse, anyhow::Error> {
-    let mut client = create_feed_api_client(auth_builder.clone()).await?;
-
-    describe_feed_with_client(auth_builder, &mut client, twin_id, feed_id, remote_host_id).await
+    let channel = create_channel(auth_builder.clone(), None, None, None).await?;
+    describe_feed_with_channel(auth_builder, channel, twin_id, feed_id, remote_host_id).await
 }
 
-pub async fn describe_feed_with_client(
+pub async fn describe_feed_with_channel(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    client: &mut FeedApiClient<Channel>,
+    channel: Channel,
     twin_id: &str,
     feed_id: &str,
     remote_host_id: Option<&str>,
 ) -> Result<DescribeFeedResponse, anyhow::Error> {
+    let mut client = FeedApiClient::new(channel);
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
