@@ -5,7 +5,21 @@ file. This change log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-- Remove of createdAt and updatedAt properties
+
+### Added
+
+- `create_channel` replaces all the `create_XXX_api_client` helper functions. It allows the configuration of `concurrency_limit`, `rate_limit` and `keep_alive_interval`.
+
+### Changed
+
+- `iotics_grpc_client::auth_builder::IntoAuthBuilder` has been moved to `iotics_grpc_client::IntoAuthBuilder`.
+- The properties inside `iotics_grpc_client::common*` have been moved to `iotics_grpc_client`.
+
+### Removed
+
+- `create_XXX_api_client` helper functions have been removed. `create_channel` should be used instead.
+- Remove of createdAt and updatedAt properties.
+
 ## [v2.0.1] - 2022-10-31
 
 ### Added

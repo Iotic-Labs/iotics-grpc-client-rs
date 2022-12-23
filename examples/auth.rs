@@ -1,4 +1,4 @@
-use iotics_grpc_client::auth_builder::IntoAuthBuilder;
+use iotics_grpc_client::IntoAuthBuilder;
 use iotics_identity::{create_agent_auth_token, create_twin_did_with_control_delegation, Config};
 /// Minimal implementation of the `AuthBuilder` for use in example scripts
 use std::sync::{Arc, Mutex};

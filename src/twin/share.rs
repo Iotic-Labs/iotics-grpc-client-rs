@@ -5,15 +5,15 @@ use tonic::transport::Channel;
 use tonic::Code;
 
 use crate::client::google::protobuf::Timestamp;
+use crate::client::iotics::api::feed_api_client::FeedApiClient;
 use crate::client::iotics::api::share_feed_data_request::{
     Arguments as ShareFeedDataRequestArguments, Payload as ShareFeedDataRequestPayload,
 };
 use crate::client::iotics::api::{FeedData, FeedId, Headers, ShareFeedDataRequest};
 
 use crate::auth_builder::IntoAuthBuilder;
+use crate::channel::create_channel;
 use crate::helpers::generate_client_app_id;
-
-use super::{create_feed_api_client, FeedApiClient};
 
 pub async fn share_data<T: Into<Vec<u8>>>(
     auth_builder: Arc<impl IntoAuthBuilder>,
@@ -22,27 +22,19 @@ pub async fn share_data<T: Into<Vec<u8>>>(
     data: T,
     retry_unknown: bool,
 ) -> Result<(), anyhow::Error> {
-    let mut client = create_feed_api_client(auth_builder.clone()).await?;
-
-    share_data_with_client(
-        auth_builder,
-        &mut client,
-        twin_id,
-        feed_id,
-        data,
-        retry_unknown,
-    )
-    .await
+    let channel = create_channel(auth_builder.clone(), None, None, None).await?;
+    share_data_with_channel(auth_builder, channel, twin_id, feed_id, data, retry_unknown).await
 }
 
-pub async fn share_data_with_client<T: Into<Vec<u8>>>(
+pub async fn share_data_with_channel<T: Into<Vec<u8>>>(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    client: &mut FeedApiClient<Channel>,
+    channel: Channel,
     twin_id: &str,
     feed_id: &str,
     data: T,
     retry_unknown: bool,
 ) -> Result<(), anyhow::Error> {
+    let mut client = FeedApiClient::new(channel);
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 

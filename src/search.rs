@@ -2,65 +2,49 @@ use anyhow::Context;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::mpsc::{channel, Receiver};
+use tokio::sync::mpsc;
 use tonic::metadata::{Ascii, MetadataValue};
-use tonic::transport::{Channel, Endpoint};
+use tonic::transport::Channel;
 
 use crate::auth_builder::IntoAuthBuilder;
+use crate::channel::create_channel;
 use crate::client::google::protobuf::StringValue;
+use crate::client::iotics::api::search_api_client::SearchApiClient;
 use crate::client::iotics::api::search_request::Payload as SearchRequestPayload;
 use crate::client::iotics::api::{Headers, Limit, Offset, Range, Scope, SubscriptionHeaders};
 use crate::helpers::generate_client_app_id;
 use crate::twin::PAGE_SIZE;
 
-pub use crate::client::iotics::api::search_api_client::SearchApiClient;
 pub use crate::client::iotics::api::search_request::payload::Filter;
 pub use crate::client::iotics::api::search_response::{
     FeedDetails, Payload as SearchResponsePayload, TwinDetails,
 };
 pub use crate::client::iotics::api::{ResponseType, SearchRequest, SearchResponse};
 
-pub async fn create_search_api_client(
-    auth_builder: Arc<impl IntoAuthBuilder>,
-    keep_alive_interval: Option<Duration>,
-) -> Result<SearchApiClient<Channel>, anyhow::Error> {
-    let host_address = auth_builder.get_host()?;
-
-    let conn = match keep_alive_interval {
-        Some(ka) => Endpoint::new(host_address)?.http2_keep_alive_interval(ka),
-        None => Endpoint::new(host_address)?,
-    };
-
-    let client = SearchApiClient::new(conn.connect().await?);
-
-    Ok(client)
-}
-
 pub async fn search(
     auth_builder: Arc<impl IntoAuthBuilder>,
     filter: Filter,
     scope: Scope,
     timeout: Option<Duration>,
-    keep_alive_interval: Option<Duration>,
-) -> Result<Receiver<Result<SearchResponse, anyhow::Error>>, anyhow::Error> {
-    let mut client = create_search_api_client(auth_builder.clone(), keep_alive_interval).await?;
-
-    search_with_client(auth_builder, &mut client, filter, scope, timeout).await
+) -> Result<mpsc::Receiver<Result<SearchResponse, anyhow::Error>>, anyhow::Error> {
+    let channel = create_channel(auth_builder.clone(), None, None, None).await?;
+    search_with_channel(auth_builder, channel, filter, scope, timeout).await
 }
 
-pub async fn search_with_client(
+pub async fn search_with_channel(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    client: &mut SearchApiClient<Channel>,
+    channel: Channel,
     filter: Filter,
     scope: Scope,
     timeout: Option<Duration>,
-) -> Result<Receiver<Result<SearchResponse, anyhow::Error>>, anyhow::Error> {
-    let token = auth_builder.get_token()?;
-
+) -> Result<mpsc::Receiver<Result<SearchResponse, anyhow::Error>>, anyhow::Error> {
+    let mut client = SearchApiClient::new(channel.clone());
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
-    let (tx, rx) = channel::<Result<SearchResponse, anyhow::Error>>(16384);
+    let token = auth_builder.get_token()?;
+
+    let (tx, rx) = mpsc::channel::<Result<SearchResponse, anyhow::Error>>(16384);
 
     let mut results_client = client.clone();
     let results_token = token.clone();
@@ -156,7 +140,7 @@ pub async fn search_with_client(
     }
 
     search_page_with_client(
-        client,
+        &mut client,
         &token,
         filter,
         scope,

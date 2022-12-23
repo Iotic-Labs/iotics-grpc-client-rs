@@ -3,33 +3,26 @@ use std::result::Result;
 use std::sync::Arc;
 use tonic::transport::Channel;
 
-pub use crate::client::iotics::api::host_api_client::HostApiClient;
+use crate::client::iotics::api::host_api_client::HostApiClient;
+
 pub use crate::client::iotics::api::{GetHostIdRequest, GetHostIdResponse, Headers};
 
 use crate::auth_builder::IntoAuthBuilder;
+use crate::channel::create_channel;
 use crate::helpers::generate_client_app_id;
-
-pub async fn create_host_api_client(
-    auth_builder: Arc<impl IntoAuthBuilder>,
-) -> Result<HostApiClient<Channel>, anyhow::Error> {
-    let host_address = auth_builder.get_host()?;
-    let client = HostApiClient::connect(host_address).await?;
-
-    Ok(client)
-}
 
 pub async fn get_local_host_id(
     auth_builder: Arc<impl IntoAuthBuilder>,
 ) -> Result<GetHostIdResponse, anyhow::Error> {
-    let mut client: HostApiClient<Channel> = create_host_api_client(auth_builder.clone()).await?;
-
-    get_local_host_id_client(auth_builder, &mut client).await
+    let channel = create_channel(auth_builder.clone(), None, None, None).await?;
+    get_local_host_id_with_channel(auth_builder, channel).await
 }
 
-pub async fn get_local_host_id_client(
+pub async fn get_local_host_id_with_channel(
     auth_builder: Arc<impl IntoAuthBuilder>,
-    client: &mut HostApiClient<Channel>,
+    channel: Channel,
 ) -> Result<GetHostIdResponse, anyhow::Error> {
+    let mut client = HostApiClient::new(channel);
     let client_app_id = generate_client_app_id();
     let transaction_ref = vec![client_app_id.clone()];
 
