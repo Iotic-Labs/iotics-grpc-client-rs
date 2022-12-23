@@ -9,10 +9,11 @@ IOTICS gRPC client in Rust.
 
 ## Usage and Version Compatibility with Iotics host:
 
-| iotics-grpc-client-rs | iotics-host |
-|----------------------| ----------- |
-|      `iotics-grpc-client = "2.0.0"`       | `>= 5`       |
-|      `iotics-grpc-client = "0.3.0"`      | `>= 4`     |
+| iotics-grpc-client-rs          | iotics-host |
+| ------------------------------ | ----------- |
+| `iotics-grpc-client = "3.x.x"` | `>= 5`      |
+| `iotics-grpc-client = "2.x.x"` | `>= 5`      |
+| `iotics-grpc-client = "0.3.x"` | `>= 4`      |
 
 [API Docs][api_docs]
 

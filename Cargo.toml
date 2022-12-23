@@ -1,6 +1,6 @@
 [package]
 name = "iotics-grpc-client"
-version = "2.0.1"
+version = "3.0.0"
 edition = "2021"
 description = "IOTICS gRPC client"
 license = "Apache-2.0"
@@ -23,7 +23,7 @@ rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
 thiserror = "1.0"
-tokio = { version = "1.20", features = ["macros", "rt-multi-thread", "time"] }
+tokio = { version = "1.22", features = ["macros", "rt-multi-thread", "time"] }
 tonic = { version = "0.8" }
 
 [dev-dependencies]

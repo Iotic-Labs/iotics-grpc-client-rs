@@ -6,6 +6,8 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+## [v3.0.0] - 2022-12-23
+
 ### Added
 
 - `create_channel` replaces all the `create_XXX_api_client` helper functions. It allows the configuration of `concurrency_limit`, `rate_limit` and `keep_alive_interval`.
