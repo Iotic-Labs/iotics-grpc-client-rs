@@ -20,7 +20,6 @@ pub async fn upsert_twin(
     feeds: Vec<UpsertFeedWithMeta>,
     inputs: Vec<UpsertInputWithMeta>,
     location: Option<GeoLocation>,
-    visibility: i32,
 ) -> Result<Response<UpsertTwinResponse>, anyhow::Error> {
     let channel = create_channel(auth_builder.clone(), None, None, None).await?;
     upsert_twin_with_channel(
@@ -31,7 +30,6 @@ pub async fn upsert_twin(
         feeds,
         inputs,
         location,
-        visibility,
     )
     .await
 }
@@ -45,7 +43,6 @@ pub async fn upsert_twin_with_channel(
     feeds: Vec<UpsertFeedWithMeta>,
     inputs: Vec<UpsertInputWithMeta>,
     location: Option<GeoLocation>,
-    visibility: i32,
 ) -> Result<Response<UpsertTwinResponse>, anyhow::Error> {
     let mut client = TwinApiClient::new(channel);
     let client_app_id = generate_client_app_id();
@@ -66,7 +63,7 @@ pub async fn upsert_twin_with_channel(
         feeds,
         inputs,
         location,
-        visibility,
+        visibility: 0, // Private visibility, the default - to be deprecated
     };
 
     let mut request = Request::new(UpsertTwinRequest {

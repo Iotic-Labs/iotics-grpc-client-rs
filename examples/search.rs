@@ -54,7 +54,6 @@ async fn main() {
         vec![],
         vec![],
         Some(london.clone()),
-        1, //Public visibility, to be deprecated
     )
     .await
     .expect("Upserting twin failed");
