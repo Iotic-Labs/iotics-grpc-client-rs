@@ -55,7 +55,6 @@ async fn create_sender(auth_builder: Arc<AuthBuilder>, did: &str) {
         vec![],
         vec![],
         None,
-        1, //Public visibility, to be deprecated
     )
     .await
     .expect("Upserting sender failed");
@@ -82,7 +81,6 @@ async fn create_receiver(auth_builder: Arc<AuthBuilder>, did: &str) {
             properties: vec![],
         }],
         None,
-        1, // Public visibility, to be deprecated
     )
     .await
     .expect("Upserting receiver failed");

@@ -19,7 +19,7 @@ use crate::client::iotics::api::update_twin_request::{
 use crate::client::iotics::api::{
     CreateFeedRequest, CreateTwinRequest, DeleteTwinRequest, FeedId, GeoLocation,
     GeoLocationUpdate, Headers, Property, PropertyUpdate, TwinId, UpdateFeedRequest,
-    UpdateTwinRequest, Value as FeedValue, Values as FeedValues, Visibility, VisibilityUpdate,
+    UpdateTwinRequest, Value as FeedValue, Values as FeedValues,
 };
 
 use crate::auth_builder::IntoAuthBuilder;
@@ -86,9 +86,6 @@ pub async fn create_update_twin_with_channel(
     };
 
     let mut payload = UpdateTwinRequestPayload {
-        new_visibility: Some(VisibilityUpdate {
-            visibility: Visibility::Public as i32,
-        }),
         properties: Some(PropertyUpdate {
             cleared_all: true,
             added: properties,
