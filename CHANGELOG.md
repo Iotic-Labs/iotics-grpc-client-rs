@@ -6,6 +6,8 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+## [v3.1.0] - 2023-01-03
+- removed visibility from upsert and update twin methods
 ## [v3.0.0] - 2022-12-23
 
 ### Added
