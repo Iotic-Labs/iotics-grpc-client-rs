@@ -6,6 +6,9 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+
+## [v3.1.2] - 2023-01-06
+- added missing no host property
 ## [v3.1.1] - 2023-01-06
 - added missing host metadata allow list property
 
