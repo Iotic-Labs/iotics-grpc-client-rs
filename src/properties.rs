@@ -47,6 +47,7 @@ pub mod common_keys {
 
         // allow list
         pub const ALL_HOST_PROPERTY: &str = "http://data.iotics.com/public#allHosts";
+        pub const NO_HOST_PROPERTY: &str = "http://data.iotics.com/public#noHost";
 
         // misc
         pub const SET_LATER_PROPERTY: &str = "<SET-LATER>";
