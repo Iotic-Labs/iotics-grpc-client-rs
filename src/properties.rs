@@ -20,6 +20,8 @@ pub mod common_keys {
 
         // allow list
         pub const HOST_ALLOW_LIST_PROPERTY: &str = "http://data.iotics.com/public#hostAllowList";
+        pub const HOST_METADATA_ALLOW_LIST_PROPERTY: &str =
+            "http://data.iotics.com/public#hostMetadataAllowList";
 
         // portal
         pub const SPACE_NAME_PROPERTY: &str = "https://data.iotics.com/app#spaceName";
