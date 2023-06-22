@@ -5,6 +5,7 @@ file. This change log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+- Updated to IOTICS API v0.0.19
 
 ## [v.4.0.0] - 2023-01-20
 - rename allowlist allhost/nohost value

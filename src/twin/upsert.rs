@@ -63,7 +63,6 @@ pub async fn upsert_twin_with_channel(
         feeds,
         inputs,
         location,
-        visibility: 0, // Private visibility, the default - to be deprecated
     };
 
     let mut request = Request::new(UpsertTwinRequest {
