@@ -7,7 +7,7 @@
 [![license][license_badge]][license]\
 IOTICS gRPC client in Rust.
 
-## Usage and Version Compatibility with Iotics host:
+## Usage and Version Compatibility with Iotics host
 
 | iotics-grpc-client-rs          | iotics-host |
 | ------------------------------ | ----------- |
@@ -31,8 +31,8 @@ cargo run --features tls --example search
 
 ### Proto files
 
--   Are submoduled in [api/](api/) from [https://github.com/Iotic-Labs/api][api_remote].
--   [proto/google/rpc/status.proto][google_proto_local] is included as it's a dependency.
+- Are submoduled in [api/](api/) from [https://github.com/Iotic-Labs/api][api_remote].
+- [proto/google/rpc/status.proto][google_proto_local] is included as it's a dependency.
 
 ### Incrementing the API version
 
@@ -55,6 +55,15 @@ git push
 git submodule update --remote
 ```
 
+### Building
+
+You will need to ensure you have the appropriate packages installed on your system to
+compile protobuf. On Ubuntu systems, for example:
+
+```bash
+sudo apt install protobuf-compiler libprotobuf-dev
+```
+
 ### PRs
 
 Commands to run before creating a PR
@@ -68,10 +77,10 @@ Should contain a summary of the changes in [CHANGELOG.md](README.md) under the U
 
 ### Releasing
 
--   Increment the version in [Cargo.toml][cargo_version]
--   Update [README.md](README.md) and [CHANGELOG.md](CHANGELOG.md) as needed
--   Commit
--   Tag the commit and push the changes to `main`
+- Increment the version in [Cargo.toml][cargo_version]
+- Update [README.md](README.md) and [CHANGELOG.md](CHANGELOG.md) as needed
+- Commit
+- Tag the commit and push the changes to `main`
 
 ```bash
     git push
@@ -79,9 +88,9 @@ Should contain a summary of the changes in [CHANGELOG.md](README.md) under the U
     git push origin vX.X.X
 ```
 
--   Release\
-    Create a [new release][releases] containing the relevant change log.\
-    The [publish.yaml][publish_action] GitHub Action will pick it up and do the actual release to [crates.io][crates].
+- Release\
+   Create a [new release][releases] containing the relevant change log.\
+   The [publish.yaml][publish_action] GitHub Action will pick it up and do the actual release to [crates.io][crates].
 
 [crates_badge]: https://img.shields.io/crates/v/iotics-grpc-client.svg
 [crates]: https://crates.io/crates/iotics-grpc-client
