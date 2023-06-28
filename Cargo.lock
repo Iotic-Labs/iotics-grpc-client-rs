@@ -497,7 +497,7 @@ dependencies = [
 
 [[package]]
 name = "iotics-grpc-client"
-version = "4.0.0"
+version = "4.1.0"
 dependencies = [
  "anyhow",
  "dotenv",

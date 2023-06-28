@@ -5,9 +5,11 @@ file. This change log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+
+## [v4.1.0] - 2023-06-28
 - Updated to IOTICS API v0.0.19
 
-## [v.4.0.0] - 2023-01-20
+## [v4.0.0] - 2023-01-20
 - rename allowlist allhost/nohost value
 ## [v3.1.2] - 2023-01-06
 - added missing no host property
@@ -101,6 +103,7 @@ file. This change log follows the conventions of
 ### Initial release of iotics-grpc-client
 
 [unreleased]: https://github.com/Iotic-Labs/iotics-grpc-client-rs
+[v4.1.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v4.1.0
 [v4.0.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v4.0.0
 [v2.0.1]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v2.0.1
 [v2.0.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v2.0.0
