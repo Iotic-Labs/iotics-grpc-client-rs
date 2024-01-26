@@ -106,6 +106,7 @@ file. This change log follows the conventions of
 ### Initial release of iotics-grpc-client
 
 [unreleased]: https://github.com/Iotic-Labs/iotics-grpc-client-rs
+[v5.0.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v5.0.0
 [v4.1.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v4.1.0
 [v4.0.0]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v4.0.0
 [v2.0.1]: https://github.com/Iotic-Labs/iotics-grpc-client-rs/tree/v2.0.1
