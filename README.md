@@ -11,6 +11,7 @@ IOTICS gRPC client in Rust.
 
 | iotics-grpc-client-rs          | iotics-host |
 | ------------------------------ | ----------- |
+| `iotics-grpc-client = "5.x.x"` | `>= 6`      |
 | `iotics-grpc-client = "4.x.x"` | `>= 6`      |
 | `iotics-grpc-client = "3.x.x"` | `>= 5`      |
 | `iotics-grpc-client = "2.x.x"` | `>= 5`      |
