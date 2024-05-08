@@ -17,7 +17,7 @@ pub struct IoticsSettings {
 
 impl IoticsSettings {
     pub fn new() -> Self {
-        dotenv::dotenv().ok();
+        dotenvy::dotenv().ok();
 
         let parse_env = |key: &str| -> String {
             std::env::var(key).unwrap_or_else(|_| panic!("env var {} is missing", key))
