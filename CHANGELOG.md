@@ -6,6 +6,12 @@ file. This change log follows the conventions of
 
 ## [Unreleased]
 
+## [v7.0.0] - 2024-06-25
+- Updated to IOTICS API v1.3.0
+
+## [v6.0.0] - 2024-05-06
+- Updated to IOTICS API v1.1.0
+
 ## [v5.0.0] - 2024-01-24
 - BREAKING CHANGE - IOTICS Public API  v1.0.1 - removed createdAt from SearchResponse, ListAllTwinsResponse, and DescribeTwinResponse
 
